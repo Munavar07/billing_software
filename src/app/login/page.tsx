@@ -1,10 +1,12 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { login } from './actions'
 import { Mail, Lock, Loader2, FileText } from 'lucide-react'
 
 export default function LoginPage() {
+    const router = useRouter()
     const [error, setError] = useState<string | null>(null)
     const [isLoading, setIsLoading] = useState(false)
 
@@ -20,6 +22,8 @@ export default function LoginPage() {
             if (result?.error) {
                 setError(result.error)
                 setIsLoading(false)
+            } else {
+                router.push('/dashboard')
             }
         } catch (err: any) {
             setError(err.message || 'Server error occurred during login. Did you configure Vercel environment variables?')
