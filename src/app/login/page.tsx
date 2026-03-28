@@ -13,11 +13,16 @@ export default function LoginPage() {
         setIsLoading(true)
         setError(null)
 
-        const formData = new FormData(e.currentTarget)
-        const result = await login(formData)
+        try {
+            const formData = new FormData(e.currentTarget)
+            const result = await login(formData)
 
-        if (result?.error) {
-            setError(result.error)
+            if (result?.error) {
+                setError(result.error)
+                setIsLoading(false)
+            }
+        } catch (err: any) {
+            setError(err.message || 'Server error occurred during login. Did you configure Vercel environment variables?')
             setIsLoading(false)
         }
     }
