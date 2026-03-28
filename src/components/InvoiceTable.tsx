@@ -174,7 +174,59 @@ export default function InvoiceTable({ initialInvoices }: Props) {
                 </div>
             </div>
 
-            <div className="overflow-x-auto">
+            {/* ── MOBILE CARD VIEW (visible on small screens) ── */}
+            <div className="md:hidden divide-y divide-gray-100">
+                {filteredInvoices.length > 0 ? (
+                    filteredInvoices.map((inv) => (
+                        <div key={inv.id} className={`p-4 hover:bg-gray-50 transition-colors ${inv.is_deleted ? 'opacity-50' : ''}`}>
+                            <div className="flex items-start justify-between gap-2">
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <span className="font-semibold text-gray-900 text-sm">{inv.invoice_number}</span>
+                                        {inv.is_deleted && <span className="text-xs text-red-500 font-medium">Deleted</span>}
+                                        <span className={`px-2 py-0.5 text-xs font-semibold rounded-full border ${statusColors[inv.status]}`}>{inv.status}</span>
+                                    </div>
+                                    <p className="text-sm text-gray-800 font-medium mt-0.5 truncate">{inv.client_name}</p>
+                                    <p className="text-xs text-gray-400 mt-0.5">{format(parseISO(inv.date), 'MMM d, yyyy')}</p>
+                                </div>
+                                <div className="text-right flex-shrink-0">
+                                    <div className="font-semibold text-gray-900">${inv.amount.toFixed(2)}</div>
+                                    <div className="text-xs text-green-600">Paid: ${inv.paid.toFixed(2)}</div>
+                                    <div className={`text-xs font-medium ${inv.amount_due > 0 ? 'text-red-500' : 'text-gray-400'}`}>
+                                        Due: ${inv.amount_due.toFixed(2)}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="mt-2 flex items-center justify-between">
+                                <div className="text-xs text-gray-400">
+                                    Svc: ${inv.profit.toFixed(2)} · Govt: ${inv.commission.toFixed(2)}
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    <button onClick={() => handleDownloadPdf(inv.id, inv.invoice_number)} className="text-blue-600 hover:text-blue-800 p-1" title="Download PDF">
+                                        <Download className="h-4 w-4" />
+                                    </button>
+                                    <Link href={`/dashboard/edit/${inv.id}`} className="text-gray-500 hover:text-gray-800 p-1" title="Edit">
+                                        <Edit2 className="h-4 w-4" />
+                                    </Link>
+                                    {!inv.is_deleted && (
+                                        <button onClick={() => handleSoftDelete(inv.id)} className="text-red-400 hover:text-red-600 p-1" title="Delete">
+                                            <Trash2 className="h-4 w-4" />
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <div className="py-12 text-center text-gray-500">
+                        <FileText className="h-10 w-10 mx-auto text-gray-300 mb-3" />
+                        <p className="text-sm">No invoices found matching your filters.</p>
+                    </div>
+                )}
+            </div>
+
+            {/* ── DESKTOP TABLE VIEW (hidden on small screens) ── */}
+            <div className="hidden md:block overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
@@ -253,3 +305,4 @@ export default function InvoiceTable({ initialInvoices }: Props) {
         </div>
     )
 }
+
