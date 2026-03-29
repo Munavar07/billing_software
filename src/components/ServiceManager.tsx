@@ -25,9 +25,6 @@ export default function ServiceManager({ initialServices }: { initialServices: S
     const handleGovtChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = parseFloat(e.target.value)
         setGovtCharge(isNaN(val) ? '' : val)
-        if (typeof totalAmount === 'number' && !isNaN(val)) {
-            setServiceCharge(totalAmount - val)
-        }
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -142,7 +139,7 @@ export default function ServiceManager({ initialServices }: { initialServices: S
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Service Charge (Profit)</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Service Charge</label>
                                 <input
                                     type="number"
                                     required
