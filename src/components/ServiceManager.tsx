@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { Service } from '@/lib/fs-db'
-import { PlusCircle, Trash2, Briefcase, Loader2, Edit2, X, Check } from 'lucide-react'
+import { PlusCircle, Trash2, Briefcase, Loader2, Edit2, X, Check, Search } from 'lucide-react'
 import { addService, deleteService, updateService } from '@/app/dashboard/services/actions'
 import { toast } from 'sonner'
 
@@ -112,33 +112,31 @@ export default function ServiceManager({ initialServices }: { initialServices: S
     )
 
     return (
-        <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-gray-100">
-                <div className="flex-1 w-full flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="space-y-8">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 pb-2">
+                <div className="flex-1 w-full flex flex-col sm:flex-row sm:items-center gap-6">
                     <div>
-                        <h2 className="text-xl font-bold text-gray-900">Services</h2>
-                        <p className="text-sm text-gray-500 mt-1">Manage your predefined services and pricing.</p>
+                        <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700 tracking-tight">Services</h2>
+                        <p className="text-sm text-slate-500 font-medium mt-1">Manage your predefined services and pricing.</p>
                     </div>
 
-                    <div className="flex-1 max-w-sm ml-0 sm:ml-4 relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
+                    <div className="flex-1 max-w-sm ml-0 sm:ml-6 relative group">
+                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none transition-colors group-focus-within:text-blue-500">
+                            <Search className="h-4 w-4 text-slate-400" />
                         </div>
                         <input
                             type="text"
-                            placeholder="Search services..."
+                            placeholder="Find a service..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                            className="block w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm bg-white shadow-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all font-medium"
                         />
                     </div>
                 </div>
                 {!isAdding ? (
                     <button
                         onClick={() => setIsAdding(true)}
-                        className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                        className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 hover:-translate-y-0.5 transition-all active:scale-95"
                     >
                         <PlusCircle className="h-4 w-4" />
                         Add Service
@@ -146,7 +144,7 @@ export default function ServiceManager({ initialServices }: { initialServices: S
                 ) : (
                     <button
                         onClick={cancelEdit}
-                        className="flex items-center gap-2 bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
+                        className="flex items-center gap-2 bg-slate-100 text-slate-600 px-5 py-2.5 rounded-xl text-sm font-bold border border-slate-200 hover:bg-slate-200 transition-all active:scale-95"
                     >
                         <X className="h-4 w-4" />
                         Cancel
@@ -155,69 +153,68 @@ export default function ServiceManager({ initialServices }: { initialServices: S
             </div>
 
             {isAdding && (
-                <div className="bg-white border border-blue-100 rounded-xl p-6 shadow-sm ring-4 ring-blue-50">
-                    <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                        {editingId ? <Edit2 className="h-5 w-5 text-blue-500" /> : <PlusCircle className="h-5 w-5 text-blue-500" />}
+                <div className="bg-white border border-blue-100 rounded-2xl p-8 shadow-xl shadow-blue-50/50 ring-4 ring-blue-50/30 animate-in fade-in slide-in-from-top-4 duration-300">
+                    <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-3">
+                        <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
+                            {editingId ? <Edit2 className="h-5 w-5" /> : <PlusCircle className="h-5 w-5" />}
+                        </div>
                         {editingId ? 'Edit Service' : 'Add New Service'}
                     </h3>
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Service Name</label>
-                            <input
-                                type="text"
-                                required
-                                value={name}
-                                onChange={e => setName(e.target.value)}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="e.g. Visa Processing"
-                            />
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Govt Charge (AED)</label>
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="md:col-span-2">
+                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Service Name</label>
                                 <input
-                                    type="number"
+                                    type="text"
                                     required
-                                    min="0"
-                                    step="0.01"
-                                    value={govtCharge}
-                                    onChange={handleGovtChange}
-                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="0.00"
+                                    value={name}
+                                    onChange={e => setName(e.target.value)}
+                                    className="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium transition-all"
+                                    placeholder="e.g. Executive Visa Processing"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Service Charge (AED)</label>
-                                <input
-                                    type="number"
-                                    required
-                                    min="0"
-                                    step="0.01"
-                                    value={serviceCharge}
-                                    onChange={e => handleServiceChange(parseFloat(e.target.value) || 0)}
-                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
-                                    placeholder="0.00"
-                                />
+                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Govt Charge (AED)</label>
+                                <div className="relative">
+                                    <span className="absolute left-4 top-3 text-slate-400 font-bold text-sm">AED</span>
+                                    <input
+                                        type="number"
+                                        required
+                                        min="0"
+                                        step="0.01"
+                                        value={govtCharge}
+                                        onChange={handleGovtChange}
+                                        className="w-full border border-slate-200 rounded-xl pl-12 pr-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-bold transition-all"
+                                        placeholder="0.00"
+                                    />
+                                </div>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Total Amount (AED)</label>
-                                <input
-                                    type="number"
-                                    required
-                                    readOnly
-                                    min="0"
-                                    step="0.01"
-                                    value={totalAmount}
-                                    className="w-full border border-gray-200 rounded-lg px-3 py-2 outline-none bg-gray-100 cursor-not-allowed"
-                                    placeholder="0.00"
-                                />
+                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Service Charge (AED)</label>
+                                <div className="relative">
+                                    <span className="absolute left-4 top-3 text-emerald-600 font-bold text-sm">AED</span>
+                                    <input
+                                        type="number"
+                                        required
+                                        min="0"
+                                        step="0.01"
+                                        value={serviceCharge}
+                                        onChange={e => handleServiceChange(parseFloat(e.target.value) || 0)}
+                                        className="w-full border border-slate-200 rounded-xl pl-12 pr-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-bold bg-emerald-50/30 transition-all text-emerald-700"
+                                        placeholder="0.00"
+                                    />
+                                </div>
                             </div>
                         </div>
-                        <div className="flex justify-end pt-2">
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-50">
+                            <div className="px-5 py-3 bg-slate-50 rounded-2xl border border-slate-100 flex items-center gap-4">
+                                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest leading-none">Total Package Cost</span>
+                                <span className="text-xl font-black text-slate-900 leading-none">AED {Number(totalAmount || 0).toFixed(2)}</span>
+                            </div>
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="flex items-center justify-center gap-2 bg-blue-600 text-white px-8 py-2.5 rounded-lg font-bold hover:bg-blue-700 transition-colors disabled:opacity-50"
+                                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-slate-900 text-white px-10 py-3.5 rounded-xl font-bold shadow-xl shadow-slate-200 hover:bg-black hover:-translate-y-0.5 transition-all active:scale-95 disabled:opacity-50"
                             >
                                 {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : editingId ? <Check className="h-5 w-5" /> : <PlusCircle className="h-5 w-5" />}
                                 {editingId ? 'Update Service' : 'Save Service'}
@@ -227,37 +224,39 @@ export default function ServiceManager({ initialServices }: { initialServices: S
                 </div>
             )}
 
-            <div className="bg-white border border-gray-200 shadow-sm rounded-xl overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+            <div className="bg-white border border-slate-200 shadow-sm rounded-2xl overflow-hidden">
+                <table className="min-w-full divide-y divide-slate-100">
+                    <thead className="bg-slate-50/50">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">Service Name</th>
-                            <th className="px-6 py-3 text-right text-xs font-bold text-gray-400 uppercase tracking-widest">Total (AED)</th>
-                            <th className="px-6 py-3 text-right text-xs font-bold text-gray-400 uppercase tracking-widest">Govt Charge</th>
-                            <th className="px-6 py-3 text-right text-xs font-bold text-gray-400 uppercase tracking-widest">Svc Charge</th>
-                            <th className="px-6 py-3 text-right text-xs font-bold text-gray-400 uppercase tracking-widest">Actions</th>
+                            <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Service Name</th>
+                            <th className="px-6 py-4 text-right text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pricing (AED)</th>
+                            <th className="px-6 py-4 text-right text-[10px] font-bold text-slate-400 uppercase tracking-widest">Govt Fee</th>
+                            <th className="px-6 py-4 text-right text-[10px] font-bold text-slate-400 uppercase tracking-widest">Our Charge</th>
+                            <th className="px-6 py-4 text-right text-[10px] font-bold text-slate-400 uppercase tracking-widest">Actions</th>
                         </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-white divide-y divide-slate-50">
                         {filteredServices.length > 0 ? (
                             filteredServices.map((service) => (
-                                <tr key={service.id} className="hover:bg-gray-50">
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{service.name}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold text-right">
-                                        {service.total_amount.toFixed(2)}
+                                <tr key={service.id} className="group hover:bg-slate-50/80 transition-all duration-200">
+                                    <td className="px-6 py-5 whitespace-nowrap text-sm font-bold text-slate-900">{service.name}</td>
+                                    <td className="px-6 py-5 whitespace-nowrap text-sm text-slate-900 font-extrabold text-right">
+                                        <span className="bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200 group-hover:bg-white group-hover:shadow-sm transition-all whitespace-nowrap">
+                                            {service.total_amount.toFixed(2)}
+                                        </span>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">
+                                    <td className="px-6 py-5 whitespace-nowrap text-xs text-slate-400 font-bold text-right leading-tight">
                                         {service.govt_charge.toFixed(2)}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium text-right">
+                                    <td className="px-6 py-5 whitespace-nowrap text-xs text-emerald-600 font-extrabold text-right leading-tight">
                                         {service.service_charge.toFixed(2)}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <div className="flex justify-end gap-2">
-                                            <button onClick={() => handleEdit(service)} className="text-blue-500 hover:text-blue-700 p-1 bg-blue-50 rounded-md transition-colors" title="Edit">
+                                    <td className="px-6 py-5 whitespace-nowrap text-right text-sm font-medium">
+                                        <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button onClick={() => handleEdit(service)} className="text-blue-500 hover:text-blue-700 p-2 hover:bg-white rounded-lg border border-transparent hover:border-slate-100 transition-all hover:scale-110" title="Edit">
                                                 <Edit2 className="h-4 w-4" />
                                             </button>
-                                            <button onClick={() => handleDelete(service.id)} className="text-red-500 hover:text-red-700 p-1 bg-red-50 rounded-md transition-colors" title="Delete">
+                                            <button onClick={() => handleDelete(service.id)} className="text-rose-400 hover:text-rose-600 p-2 hover:bg-white rounded-lg border border-transparent hover:border-slate-100 transition-all hover:scale-110" title="Delete">
                                                 <Trash2 className="h-4 w-4" />
                                             </button>
                                         </div>
@@ -266,9 +265,11 @@ export default function ServiceManager({ initialServices }: { initialServices: S
                             ))
                         ) : (
                             <tr>
-                                <td colSpan={4} className="px-6 py-12 text-center text-gray-500">
-                                    <Briefcase className="mx-auto h-12 w-12 text-gray-300 mb-3" />
-                                    <p>No predefined services added yet.</p>
+                                <td colSpan={5} className="px-6 py-20 text-center">
+                                    <div className="bg-slate-50 w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-4 border border-slate-100">
+                                        <Briefcase className="h-10 w-10 text-slate-200" />
+                                    </div>
+                                    <p className="text-sm font-bold text-slate-400">No services found matching your criteria.</p>
                                 </td>
                             </tr>
                         )}
