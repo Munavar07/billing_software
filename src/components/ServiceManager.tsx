@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react'
 import { Service } from '@/lib/fs-db'
-import { PlusCircle, Trash2, Briefcase } from 'lucide-react'
-import { addServiceAction, deleteServiceAction } from '@/app/dashboard/services/actions'
+import { PlusCircle, Trash2, Briefcase, Loader2, Edit2, X, Check } from 'lucide-react'
+import { addService, deleteService, updateService } from '@/app/dashboard/services/actions'
 import { toast } from 'sonner'
 
 export default function ServiceManager({ initialServices }: { initialServices: Service[] }) {
@@ -16,6 +16,7 @@ export default function ServiceManager({ initialServices }: { initialServices: S
     const [totalAmount, setTotalAmount] = useState<number | ''>('')
     const [govtCharge, setGovtCharge] = useState<number | ''>('')
     const [serviceCharge, setServiceCharge] = useState<number | ''>('')
+    const [editingId, setEditingId] = useState<string | null>(null)
 
     const handleGovtChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = parseFloat(e.target.value) || 0
@@ -34,45 +35,70 @@ export default function ServiceManager({ initialServices }: { initialServices: S
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (!name || totalAmount === '' || govtCharge === '' || serviceCharge === '') {
-            toast.error('Please fill all fields')
-            return
-        }
+        if (!name || totalAmount === '' || govtCharge === '' || serviceCharge === '') return
 
         setIsLoading(true)
-        const formData = new FormData()
-        formData.append('name', name)
-        formData.append('total_amount', totalAmount.toString())
-        formData.append('govt_charge', govtCharge.toString())
-        formData.append('service_charge', serviceCharge.toString())
+        try {
+            if (editingId) {
+                await updateService(editingId, {
+                    name,
+                    total_amount: totalAmount as number,
+                    govt_charge: govtCharge as number,
+                    service_charge: serviceCharge as number
+                })
+                setServices(services.map(s => s.id === editingId ? {
+                    ...s,
+                    name,
+                    total_amount: totalAmount as number,
+                    govt_charge: govtCharge as number,
+                    service_charge: serviceCharge as number
+                } : s))
+                setEditingId(null)
+                toast.success('Service updated successfully')
+            } else {
+                const newService = await addService({
+                    name,
+                    total_amount: totalAmount as number,
+                    govt_charge: govtCharge as number,
+                    service_charge: serviceCharge as number
+                })
+                setServices([newService, ...services])
+                toast.success('Service added successfully')
+            }
 
-        const res = await addServiceAction(formData)
-        if (res.error) {
-            toast.error(res.error)
-        } else {
-            toast.success('Service added successfully')
-            setIsAdding(false)
             setName('')
             setTotalAmount('')
             setGovtCharge('')
             setServiceCharge('')
-            // Optimistic update
-            setServices([{
-                id: crypto.randomUUID(),
-                name,
-                total_amount: totalAmount as number,
-                govt_charge: govtCharge as number,
-                service_charge: serviceCharge as number,
-                created_at: new Date().toISOString()
-            }, ...services])
+            setIsAdding(false)
+        } catch (error) {
+            toast.error(editingId ? 'Failed to update service' : 'Failed to add service')
         }
         setIsLoading(false)
     }
 
+    const handleEdit = (service: Service) => {
+        setName(service.name)
+        setGovtCharge(service.govt_charge)
+        setServiceCharge(service.service_charge)
+        setTotalAmount(service.total_amount)
+        setEditingId(service.id)
+        setIsAdding(true)
+    }
+
+    const cancelEdit = () => {
+        setEditingId(null)
+        setName('')
+        setTotalAmount('')
+        setGovtCharge('')
+        setServiceCharge('')
+        setIsAdding(false)
+    }
+
     const handleDelete = async (id: string) => {
         if (!confirm('Are you sure you want to delete this service?')) return
-        const res = await deleteServiceAction(id)
-        if (res.error) {
+        const res = await deleteService(id)
+        if (res?.error) {
             toast.error(res.error)
         } else {
             setServices(services.filter(s => s.id !== id))
@@ -82,12 +108,12 @@ export default function ServiceManager({ initialServices }: { initialServices: S
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-gray-100">
                 <div>
                     <h2 className="text-xl font-bold text-gray-900">Services</h2>
-                    <p className="text-sm text-gray-500 mt-1">Manage your predefined predefined services and pricing.</p>
+                    <p className="text-sm text-gray-500 mt-1">Manage your predefined services and pricing.</p>
                 </div>
-                {!isAdding && (
+                {!isAdding ? (
                     <button
                         onClick={() => setIsAdding(true)}
                         className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
@@ -95,15 +121,23 @@ export default function ServiceManager({ initialServices }: { initialServices: S
                         <PlusCircle className="h-4 w-4" />
                         Add Service
                     </button>
+                ) : (
+                    <button
+                        onClick={cancelEdit}
+                        className="flex items-center gap-2 bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
+                    >
+                        <X className="h-4 w-4" />
+                        Cancel
+                    </button>
                 )}
             </div>
 
             {isAdding && (
-                <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm animate-in fade-in slide-in-from-top-4">
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-lg font-semibold text-gray-900">New Service</h3>
-                        <button onClick={() => setIsAdding(false)} className="text-gray-400 hover:text-gray-500">✕</button>
-                    </div>
+                <div className="bg-white border border-blue-100 rounded-xl p-6 shadow-sm ring-4 ring-blue-50">
+                    <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        {editingId ? <Edit2 className="h-5 w-5 text-blue-500" /> : <PlusCircle className="h-5 w-5 text-blue-500" />}
+                        {editingId ? 'Edit Service' : 'Add New Service'}
+                    </h3>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Service Name</label>
@@ -161,9 +195,10 @@ export default function ServiceManager({ initialServices }: { initialServices: S
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                                className="flex items-center justify-center gap-2 bg-blue-600 text-white px-8 py-2.5 rounded-lg font-bold hover:bg-blue-700 transition-colors disabled:opacity-50"
                             >
-                                {isLoading ? 'Saving...' : 'Save Service'}
+                                {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : editingId ? <Check className="h-5 w-5" /> : <PlusCircle className="h-5 w-5" />}
+                                {editingId ? 'Update Service' : 'Save Service'}
                             </button>
                         </div>
                     </form>
@@ -174,11 +209,11 @@ export default function ServiceManager({ initialServices }: { initialServices: S
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Service Name</th>
-                            <th scope="col" className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Amount</th>
-                            <th scope="col" className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Govt Charge</th>
-                            <th scope="col" className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Service Charge</th>
-                            <th scope="col" className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                            <th className="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">Service Name</th>
+                            <th className="px-6 py-3 text-right text-xs font-bold text-gray-400 uppercase tracking-widest">Total (AED)</th>
+                            <th className="px-6 py-3 text-right text-xs font-bold text-gray-400 uppercase tracking-widest">Govt Charge</th>
+                            <th className="px-6 py-3 text-right text-xs font-bold text-gray-400 uppercase tracking-widest">Svc Charge</th>
+                            <th className="px-6 py-3 text-right text-xs font-bold text-gray-400 uppercase tracking-widest">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -186,22 +221,24 @@ export default function ServiceManager({ initialServices }: { initialServices: S
                             services.map((service) => (
                                 <tr key={service.id} className="hover:bg-gray-50">
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{service.name}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right font-bold">
-                                        <span className="text-gray-500">AED </span>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold text-right">
                                         {service.total_amount.toFixed(2)}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="text-sm text-gray-500">
-                                            <span className="text-gray-400">Govt: </span>{service.govt_charge.toFixed(2)}
-                                        </div>
-                                        <div className="text-sm text-gray-500">
-                                            <span className="text-gray-400">Service: </span>{service.service_charge.toFixed(2)}
-                                        </div>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">
+                                        {service.govt_charge.toFixed(2)}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium text-right">
+                                        {service.service_charge.toFixed(2)}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <button onClick={() => handleDelete(service.id)} className="text-red-500 hover:text-red-700 p-1">
-                                            <Trash2 className="h-4 w-4" />
-                                        </button>
+                                        <div className="flex justify-end gap-2">
+                                            <button onClick={() => handleEdit(service)} className="text-blue-500 hover:text-blue-700 p-1 bg-blue-50 rounded-md transition-colors" title="Edit">
+                                                <Edit2 className="h-4 w-4" />
+                                            </button>
+                                            <button onClick={() => handleDelete(service.id)} className="text-red-500 hover:text-red-700 p-1 bg-red-50 rounded-md transition-colors" title="Delete">
+                                                <Trash2 className="h-4 w-4" />
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))

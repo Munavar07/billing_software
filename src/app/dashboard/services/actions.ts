@@ -1,40 +1,35 @@
 'use server'
 
-import { createService, updateService, deleteService } from '@/lib/fs-db'
+import { createService, updateService as dbUpdateService, deleteService as dbDeleteService, Service } from '@/lib/fs-db'
 import { revalidatePath } from 'next/cache'
 
-export async function addServiceAction(formData: FormData) {
-    const name = formData.get('name') as string
-    const total_amount = Number(formData.get('total_amount'))
-    const govt_charge = Number(formData.get('govt_charge'))
-    const service_charge = Number(formData.get('service_charge'))
-
-    if (!name || isNaN(total_amount)) {
-        return { error: 'Invalid input' }
-    }
-
+export async function addService(data: Omit<Service, 'id' | 'created_at'>) {
     try {
-        await createService({
-            name,
-            total_amount,
-            govt_charge,
-            service_charge
-        })
+        const newService = await createService(data)
         revalidatePath('/dashboard/services')
         revalidatePath('/dashboard/create')
-        return { success: true }
+        return newService
     } catch (e: any) {
-        return { error: e.message }
+        throw new Error(e.message)
     }
 }
 
-export async function deleteServiceAction(id: string) {
+export async function updateService(id: string, data: Partial<Service>) {
     try {
-        await deleteService(id)
+        await dbUpdateService(id, data)
         revalidatePath('/dashboard/services')
         revalidatePath('/dashboard/create')
-        return { success: true }
     } catch (e: any) {
-        return { error: e.message }
+        throw new Error(e.message)
+    }
+}
+
+export async function deleteService(id: string) {
+    try {
+        await dbDeleteService(id)
+        revalidatePath('/dashboard/services')
+        revalidatePath('/dashboard/create')
+    } catch (e: any) {
+        throw new Error(e.message)
     }
 }
