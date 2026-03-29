@@ -80,7 +80,10 @@ export async function createInvoice(data: Omit<Invoice, 'id' | 'created_at' | 'i
         .select()
         .single()
 
-    if (error) throw new Error(error.message)
+    if (error) {
+        console.error('Supabase error in createInvoice:', error)
+        throw new Error(error.message)
+    }
     return inserted as Invoice
 }
 
@@ -93,7 +96,11 @@ export async function updateInvoice(id: string, updates: Partial<Invoice>): Prom
         .select()
         .single()
 
-    if (error || !data) return null
+    if (error) {
+        console.error('Supabase error in updateInvoice:', error)
+        return null
+    }
+    if (!data) return null
     return data as Invoice
 }
 

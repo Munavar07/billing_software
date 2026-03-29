@@ -32,7 +32,8 @@ export async function POST(request: NextRequest) {
             created_by: user.email,
         })
         return NextResponse.json(newInvoice, { status: 201 })
-    } catch (error) {
-        return NextResponse.json({ error: 'Failed to create invoice' }, { status: 500 })
+    } catch (error: any) {
+        console.error('Error in POST /api/invoices:', error)
+        return NextResponse.json({ error: error.message || 'Failed to create invoice' }, { status: 500 })
     }
 }

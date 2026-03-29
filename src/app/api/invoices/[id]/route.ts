@@ -19,12 +19,13 @@ export async function PUT(
         const updatedInvoice = await updateInvoice(id, updates)
 
         if (!updatedInvoice) {
-            return NextResponse.json({ error: 'Invoice not found' }, { status: 404 })
+            return NextResponse.json({ error: 'Invoice not found or failed to update' }, { status: 404 })
         }
 
         return NextResponse.json(updatedInvoice)
-    } catch (error) {
-        return NextResponse.json({ error: 'Failed to update invoice' }, { status: 500 })
+    } catch (error: any) {
+        console.error(`Error in PUT /api/invoices/${(await params).id}:`, error)
+        return NextResponse.json({ error: error.message || 'Failed to update invoice' }, { status: 500 })
     }
 }
 
@@ -44,11 +45,12 @@ export async function DELETE(
         const success = await deleteInvoice(id)
 
         if (!success) {
-            return NextResponse.json({ error: 'Invoice not found' }, { status: 404 })
+            return NextResponse.json({ error: 'Invoice not found or failed to delete' }, { status: 404 })
         }
 
         return NextResponse.json({ message: 'Deleted successfully' })
-    } catch (error) {
-        return NextResponse.json({ error: 'Failed to delete invoice' }, { status: 500 })
+    } catch (error: any) {
+        console.error(`Error in DELETE /api/invoices/${(await params).id}:`, error)
+        return NextResponse.json({ error: error.message || 'Failed to delete invoice' }, { status: 500 })
     }
 }
