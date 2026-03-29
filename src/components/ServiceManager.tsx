@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 
 export default function ServiceManager({ initialServices }: { initialServices: Service[] }) {
     const [services, setServices] = useState<Service[]>(initialServices)
+    const [searchTerm, setSearchTerm] = useState('')
     const [isAdding, setIsAdding] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
 
@@ -106,12 +107,33 @@ export default function ServiceManager({ initialServices }: { initialServices: S
         }
     }
 
+    const filteredServices = services.filter(s =>
+        s.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-gray-100">
-                <div>
-                    <h2 className="text-xl font-bold text-gray-900">Services</h2>
-                    <p className="text-sm text-gray-500 mt-1">Manage your predefined services and pricing.</p>
+                <div className="flex-1 w-full flex flex-col sm:flex-row sm:items-center gap-4">
+                    <div>
+                        <h2 className="text-xl font-bold text-gray-900">Services</h2>
+                        <p className="text-sm text-gray-500 mt-1">Manage your predefined services and pricing.</p>
+                    </div>
+
+                    <div className="flex-1 max-w-sm ml-0 sm:ml-4 relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                        <input
+                            type="text"
+                            placeholder="Search services..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                        />
+                    </div>
                 </div>
                 {!isAdding ? (
                     <button
@@ -217,8 +239,8 @@ export default function ServiceManager({ initialServices }: { initialServices: S
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {services.length > 0 ? (
-                            services.map((service) => (
+                        {filteredServices.length > 0 ? (
+                            filteredServices.map((service) => (
                                 <tr key={service.id} className="hover:bg-gray-50">
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{service.name}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold text-right">

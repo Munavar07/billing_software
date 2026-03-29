@@ -100,7 +100,8 @@ export default function InvoiceTable({ initialInvoices }: Props) {
             const q = search.toLowerCase()
             result = result.filter(inv =>
                 inv.invoice_number.toLowerCase().includes(q) ||
-                inv.client_name.toLowerCase().includes(q)
+                inv.client_name.toLowerCase().includes(q) ||
+                (inv.hidden_remarks || '').toLowerCase().includes(q)
             )
         }
 
@@ -117,7 +118,7 @@ export default function InvoiceTable({ initialInvoices }: Props) {
                         </div>
                         <input
                             type="text"
-                            placeholder="Search by invoice # or client..."
+                            placeholder="Search by invoice #, client or description..."
                             className="pl-10 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 outline-none border py-2"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}

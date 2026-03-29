@@ -174,7 +174,8 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
                         onCreateOption={handleClientCreate}
                         options={clientOptions}
                         value={formData.client_name ? { label: formData.client_name, value: formData.client_name } : null}
-                        placeholder="Select or type a new client..."
+                        isSearchable
+                        placeholder="Search or type client name..."
                         styles={{
                             control: (base) => ({
                                 ...base,
