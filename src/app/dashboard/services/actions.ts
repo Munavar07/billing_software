@@ -10,6 +10,7 @@ export async function addService(data: Omit<Service, 'id' | 'created_at'>) {
         revalidatePath('/dashboard/create')
         return newService
     } catch (e: any) {
+        console.error('Add service error:', e)
         throw new Error(e.message)
     }
 }
@@ -19,8 +20,10 @@ export async function updateService(id: string, data: Partial<Service>) {
         await dbUpdateService(id, data)
         revalidatePath('/dashboard/services')
         revalidatePath('/dashboard/create')
+        return { success: true }
     } catch (e: any) {
-        throw new Error(e.message)
+        console.error('Update service error:', e)
+        return { error: e.message }
     }
 }
 
@@ -29,7 +32,9 @@ export async function deleteService(id: string) {
         await dbDeleteService(id)
         revalidatePath('/dashboard/services')
         revalidatePath('/dashboard/create')
+        return { success: true }
     } catch (e: any) {
-        throw new Error(e.message)
+        console.error('Delete service error:', e)
+        return { error: e.message }
     }
 }
