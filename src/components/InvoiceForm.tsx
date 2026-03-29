@@ -73,13 +73,18 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
                 body: JSON.stringify(formData)
             })
 
-            if (!res.ok) throw new Error('Failed to save')
+            const responseData = await res.json()
+
+            if (!res.ok) {
+                throw new Error(responseData.error || 'Failed to save')
+            }
 
             toast.success(isEdit ? 'Invoice updated!' : 'Invoice created!')
             router.push('/dashboard')
             router.refresh()
-        } catch (error) {
-            toast.error('Failed to save invoice')
+        } catch (error: any) {
+            console.error('Save error:', error)
+            toast.error(error.message || 'Failed to save invoice')
             setLoading(false)
         }
     }
