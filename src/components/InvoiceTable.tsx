@@ -95,7 +95,8 @@ export default function InvoiceTable({ initialInvoices }: Props) {
             result = result.filter(inv =>
                 inv.invoice_number.toLowerCase().includes(q) ||
                 inv.client_name.toLowerCase().includes(q) ||
-                (inv.hidden_remarks || '').toLowerCase().includes(q)
+                (inv.hidden_remarks || '').toLowerCase().includes(q) ||
+                (inv.invoice_description || '').toLowerCase().includes(q)
             )
         }
 
