@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { PlusCircle, Users, FileText, TrendingUp, ArrowRight, Loader2 } from 'lucide-react'
+import { PlusCircle, Users, FileText, TrendingUp, ArrowRight, Loader2, Search } from 'lucide-react'
 import Link from 'next/link'
 import { addClientAction } from '@/app/dashboard/clients/actions'
 import { toast } from 'sonner'
@@ -17,6 +17,7 @@ interface ClientStats {
 
 export default function ClientHubManager({ initialClients }: { initialClients: ClientStats[] }) {
     const [clients, setClients] = useState<ClientStats[]>(initialClients)
+    const [searchTerm, setSearchTerm] = useState('')
     const [isAdding, setIsAdding] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const [newName, setNewName] = useState('')
@@ -48,22 +49,39 @@ export default function ClientHubManager({ initialClients }: { initialClients: C
         setIsLoading(false)
     }
 
+    const filteredClients = clients.filter(c =>
+        c.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 text-slate-800">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-gray-100">
-                <div>
+                <div className="flex-1">
                     <h2 className="text-xl font-bold text-gray-900">Clients Hub</h2>
                     <p className="text-sm text-gray-500 mt-1">Manage your clients and view their specific metrics.</p>
                 </div>
-                {!isAdding && (
-                    <button
-                        onClick={() => setIsAdding(true)}
-                        className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
-                    >
-                        <PlusCircle className="h-4 w-4" />
-                        Add New Client
-                    </button>
-                )}
+
+                <div className="flex items-center gap-3 w-full sm:w-auto">
+                    <div className="relative flex-1 sm:w-64">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <input
+                            type="text"
+                            placeholder="Search names..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full pl-9 pr-3 py-2 bg-white border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                        />
+                    </div>
+                    {!isAdding && (
+                        <button
+                            onClick={() => setIsAdding(true)}
+                            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors whitespace-nowrap"
+                        >
+                            <PlusCircle className="h-4 w-4" />
+                            Add Client
+                        </button>
+                    )}
+                </div>
             </div>
 
             {isAdding && (
@@ -104,8 +122,8 @@ export default function ClientHubManager({ initialClients }: { initialClients: C
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {clients.length > 0 ? (
-                    clients.map((client) => (
+                {filteredClients.length > 0 ? (
+                    filteredClients.map((client) => (
                         <div key={client.name} className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow group flex flex-col uppercase">
                             <div className="p-5 flex-1">
                                 <div className="flex items-center gap-3 mb-4">
@@ -122,19 +140,19 @@ export default function ClientHubManager({ initialClients }: { initialClients: C
                                     </div>
                                     <div>
                                         <div className="text-gray-400 text-[10px] uppercase font-bold tracking-wider mb-1 flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5" /> Profit</div>
-                                        <div className="font-semibold text-green-600">${client.totalProfit.toFixed(2)}</div>
+                                        <div className="font-semibold text-green-600">AED {client.totalProfit.toFixed(2)}</div>
                                     </div>
                                 </div>
 
                                 <div className="space-y-2 text-sm border-t border-gray-100 pt-3">
                                     <div className="flex justify-between">
                                         <span className="text-gray-500">Total Billed:</span>
-                                        <span className="font-medium text-gray-900">${client.totalBilled.toFixed(2)}</span>
+                                        <span className="font-medium text-gray-900">AED {client.totalBilled.toFixed(2)}</span>
                                     </div>
                                     <div className="flex justify-between">
                                         <span className="text-gray-500">Amount Due:</span>
                                         <span className={`font-medium ${client.totalDue > 0 ? 'text-red-500' : 'text-gray-900'}`}>
-                                            ${client.totalDue.toFixed(2)}
+                                            AED {client.totalDue.toFixed(2)}
                                         </span>
                                     </div>
                                 </div>

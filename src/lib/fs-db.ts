@@ -10,7 +10,7 @@ export interface Invoice {
     amount_due: number
     profit: number
     commission: number
-    status: 'Paid' | 'Partial' | 'Unpaid'
+    status: 'Paid' | 'Partially Paid' | 'Unpaid'
     created_by: string
     hidden_remarks?: string
     is_deleted: boolean

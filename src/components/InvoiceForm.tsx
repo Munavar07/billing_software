@@ -46,7 +46,7 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
         let newStatus = formData.status
         if (formData.amount > 0) {
             if (formData.paid >= formData.amount) newStatus = 'Paid'
-            else if (formData.paid > 0) newStatus = 'Partial'
+            else if (formData.paid > 0) newStatus = 'Partially Paid'
             else newStatus = 'Unpaid'
         }
 
@@ -83,10 +83,37 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
     }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        const { name, value, type } = e.target as HTMLInputElement
+        const { name, value } = e.target
+
+        // Handle numeric fields
+        if (['amount', 'paid', 'commission', 'profit'].includes(name)) {
+            const val = parseFloat(value) || 0
+
+            if (name === 'commission' || name === 'profit') {
+                const commission = name === 'commission' ? val : (formData.commission as number)
+                const profit = name === 'profit' ? val : (formData.profit as number)
+                const total = commission + profit
+
+                setFormData(prev => ({
+                    ...prev,
+                    [name]: val,
+                    amount: total,
+                    amount_due: Math.max(0, total - (prev.paid as number))
+                }))
+            } else if (name === 'paid') {
+                setFormData(prev => ({
+                    ...prev,
+                    paid: val,
+                    amount_due: Math.max(0, (prev.amount as number) - val)
+                }))
+            }
+            return
+        }
+
+        // Handle string/enum fields
         setFormData(prev => ({
             ...prev,
-            [name]: type === 'number' ? Number(value) : value
+            [name]: value
         }))
     }
 
@@ -100,8 +127,8 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
             setFormData(prev => ({
                 ...prev,
                 amount: service.total_amount,
-                commission: service.govt_charge, // Govt Charge
-                profit: service.service_charge, // Service Charge
+                commission: service.govt_charge,
+                profit: service.service_charge,
                 hidden_remarks: prev.hidden_remarks ? prev.hidden_remarks : service.name
             }))
         }
@@ -113,7 +140,6 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
         setClientOptions(prev => [...prev, newOption])
         setFormData(prev => ({ ...prev, client_name: inputValue }))
 
-        // Try saving it explicitly to DB if clients table exists
         await addClientAction(inputValue)
         setLoading(false)
     }
@@ -172,7 +198,7 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
                         >
                             <option value="">-- Choose a service --</option>
                             {services.map(s => (
-                                <option key={s.id} value={s.id}>{s.name} (${s.total_amount})</option>
+                                <option key={s.id} value={s.id}>{s.name} (AED {s.total_amount})</option>
                             ))}
                         </select>
                         <p className="text-xs text-blue-600 mt-1.5">Selecting a service will automatically fill the Total Amount, Govt Charge, and Service Charge.</p>
@@ -180,37 +206,37 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
                 )}
 
                 <div>
-                    <label className="block font-medium text-gray-700 mb-1">Total Amount ($) <span className="text-red-500">*</span></label>
-                    <input required type="number" min="0" step="0.01" name="amount" value={formData.amount} onChange={handleChange} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 py-2.5 px-3 outline-none" />
+                    <label className="block font-medium text-gray-700 mb-1">Govt Charge (AED)</label>
+                    <input type="number" name="commission" value={formData.commission} onChange={handleChange} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 py-2.5 px-3 outline-none" placeholder="0" />
                 </div>
 
                 <div>
-                    <label className="block font-medium text-gray-700 mb-1">Amount Paid ($) <span className="text-red-500">*</span></label>
-                    <input required type="number" min="0" step="0.01" name="paid" value={formData.paid} onChange={handleChange} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 py-2.5 px-3 outline-none" />
+                    <label className="block font-medium text-gray-700 mb-1">Service Charge (AED)</label>
+                    <input type="number" name="profit" value={formData.profit} onChange={handleChange} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 py-2.5 px-3 outline-none" placeholder="0" />
                 </div>
 
                 <div>
-                    <label className="block font-medium text-gray-700 mb-1">Amount Due ($)</label>
-                    <input disabled type="number" value={formData.amount_due} className="w-full border border-gray-200 bg-gray-50 text-gray-500 rounded-lg shadow-sm py-2.5 px-3 outline-none cursor-not-allowed" />
+                    <label className="block font-medium text-gray-700 mb-1">Total Amount (AED)</label>
+                    <input readOnly type="number" name="amount" value={formData.amount} className="w-full border border-gray-200 rounded-lg shadow-sm py-2.5 px-3 outline-none bg-gray-100 cursor-not-allowed font-bold" placeholder="0" />
+                </div>
+
+                <div>
+                    <label className="block font-medium text-gray-700 mb-1">Amount Paid (AED) <span className="text-red-500">*</span></label>
+                    <input required type="number" name="paid" value={formData.paid} onChange={handleChange} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 py-2.5 px-3 outline-none" placeholder="0" />
+                </div>
+
+                <div>
+                    <label className="block font-medium text-gray-700 mb-1">Amount Due (AED)</label>
+                    <input readOnly type="number" name="amount_due" value={formData.amount_due} className="w-full border border-gray-200 rounded-lg shadow-sm py-2.5 px-3 outline-none bg-gray-100 cursor-not-allowed" />
                 </div>
 
                 <div>
                     <label className="block font-medium text-gray-700 mb-1">Status</label>
-                    <select name="status" value={formData.status} onChange={handleChange} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 py-2.5 px-3 outline-none">
-                        <option value="Paid">Paid</option>
-                        <option value="Partial">Partial</option>
+                    <select name="status" value={formData.status} onChange={handleChange} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 py-2.5 px-3 outline-none appearance-none bg-white">
                         <option value="Unpaid">Unpaid</option>
+                        <option value="Partially Paid">Partially Paid</option>
+                        <option value="Paid">Paid</option>
                     </select>
-                </div>
-
-                <div>
-                    <label className="block font-medium text-gray-700 mb-1">Service Charge ($)</label>
-                    <input type="number" min="0" step="0.01" name="profit" value={formData.profit} onChange={handleChange} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 py-2.5 px-3 outline-none" />
-                </div>
-
-                <div>
-                    <label className="block font-medium text-gray-700 mb-1">Govt Charge ($)</label>
-                    <input type="number" min="0" step="0.01" name="commission" value={formData.commission} onChange={handleChange} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 py-2.5 px-3 outline-none" />
                 </div>
 
                 <div className="md:col-span-2">

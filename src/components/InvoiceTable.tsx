@@ -12,11 +12,17 @@ interface Props {
     initialInvoices: Invoice[]
 }
 
-const statusColors = {
-    Paid: 'bg-green-100 text-green-800 border-green-200',
-    Partial: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-    Unpaid: 'bg-red-100 text-red-800 border-red-200'
-}
+const statusStyles = {
+    Paid: 'bg-green-100 text-green-700 border-green-200',
+    'Partially Paid': 'bg-blue-100 text-blue-700 border-blue-200',
+    Unpaid: 'bg-red-100 text-red-700 border-red-200',
+} as const
+
+const statusDotStyles = {
+    Paid: 'bg-green-500',
+    'Partially Paid': 'bg-blue-500',
+    Unpaid: 'bg-red-500',
+} as const
 
 export default function InvoiceTable({ initialInvoices }: Props) {
     const router = useRouter()
@@ -127,7 +133,7 @@ export default function InvoiceTable({ initialInvoices }: Props) {
                         >
                             <option value="All">All Status</option>
                             <option value="Paid">Paid</option>
-                            <option value="Partial">Partial</option>
+                            <option value="Partially Paid">Partially Paid</option>
                             <option value="Unpaid">Unpaid</option>
                         </select>
 
@@ -184,22 +190,22 @@ export default function InvoiceTable({ initialInvoices }: Props) {
                                     <div className="flex items-center gap-2 flex-wrap">
                                         <span className="font-semibold text-gray-900 text-sm">{inv.invoice_number}</span>
                                         {inv.is_deleted && <span className="text-xs text-red-500 font-medium">Deleted</span>}
-                                        <span className={`px-2 py-0.5 text-xs font-semibold rounded-full border ${statusColors[inv.status]}`}>{inv.status}</span>
+                                        <span className={`px-2 py-0.5 text-xs font-semibold rounded-full border ${statusStyles[inv.status as keyof typeof statusStyles]}`}>{inv.status}</span>
                                     </div>
                                     <p className="text-sm text-gray-800 font-medium mt-0.5 truncate">{inv.client_name}</p>
                                     <p className="text-xs text-gray-400 mt-0.5">{format(parseISO(inv.date), 'MMM d, yyyy')}</p>
                                 </div>
                                 <div className="text-right flex-shrink-0">
-                                    <div className="font-semibold text-gray-900">${inv.amount.toFixed(2)}</div>
-                                    <div className="text-xs text-green-600">Paid: ${inv.paid.toFixed(2)}</div>
+                                    <div className="font-semibold text-gray-900">AED {inv.amount.toFixed(2)}</div>
+                                    <div className="text-xs text-green-600">Paid: AED {inv.paid.toFixed(2)}</div>
                                     <div className={`text-xs font-medium ${inv.amount_due > 0 ? 'text-red-500' : 'text-gray-400'}`}>
-                                        Due: ${inv.amount_due.toFixed(2)}
+                                        Due: AED {inv.amount_due.toFixed(2)}
                                     </div>
                                 </div>
                             </div>
                             <div className="mt-2 flex items-center justify-between">
                                 <div className="text-xs text-gray-400">
-                                    Svc: ${inv.profit.toFixed(2)} · Govt: ${inv.commission.toFixed(2)}
+                                    Svc: AED {inv.profit.toFixed(2)} · Govt: AED {inv.commission.toFixed(2)}
                                 </div>
                                 <div className="flex items-center gap-4">
                                     <button onClick={() => handleDownloadPdf(inv.id, inv.invoice_number)} className="text-blue-600 hover:text-blue-800 p-1" title="Download PDF">
@@ -257,22 +263,22 @@ export default function InvoiceTable({ initialInvoices }: Props) {
                                         </div>
                                     </td>
                                     <td className="px-5 py-4 whitespace-nowrap">
-                                        <span className={`px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border ${statusColors[inv.status]}`}>
+                                        <span className={`px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border ${statusStyles[inv.status as keyof typeof statusStyles]}`}>
                                             {inv.status}
                                         </span>
                                     </td>
                                     <td className="px-5 py-4 whitespace-nowrap text-right">
-                                        <div className="text-gray-900 font-medium">${inv.amount.toFixed(2)}</div>
-                                        <div className="text-xs text-green-600">Paid: ${inv.paid.toFixed(2)}</div>
+                                        <div className="text-gray-900 font-medium">AED {inv.amount.toFixed(2)}</div>
+                                        <div className="text-xs text-green-600">Paid: AED {inv.paid.toFixed(2)}</div>
                                     </td>
                                     <td className="px-5 py-4 whitespace-nowrap text-right">
                                         <span className={`font-medium ${inv.amount_due > 0 ? 'text-red-600' : 'text-gray-900'}`}>
-                                            ${inv.amount_due.toFixed(2)}
+                                            AED {inv.amount_due.toFixed(2)}
                                         </span>
                                     </td>
                                     <td className="px-5 py-4 whitespace-nowrap text-right">
-                                        <div className="text-gray-900">Service Charge: ${inv.profit.toFixed(2)}</div>
-                                        <div className="text-xs text-gray-500">Govt Charge: ${inv.commission.toFixed(2)}</div>
+                                        <div className="text-gray-900">Service Charge: AED {inv.profit.toFixed(2)}</div>
+                                        <div className="text-xs text-gray-500">Govt Charge: AED {inv.commission.toFixed(2)}</div>
                                     </td>
                                     <td className="px-5 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <div className="flex items-center justify-end space-x-3">

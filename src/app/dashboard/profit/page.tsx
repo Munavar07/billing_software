@@ -49,7 +49,7 @@ export default async function ProfitPage() {
                         </div>
                     </div>
                     <div>
-                        <div className="text-3xl font-bold text-gray-900">${totalRevenue.toFixed(2)}</div>
+                        <div className="text-3xl font-bold text-gray-900">AED {totalRevenue.toFixed(2)}</div>
                         <div className="text-sm text-gray-500 mt-1">Across {invoices.length} invoices</div>
                     </div>
                 </div>
@@ -62,8 +62,8 @@ export default async function ProfitPage() {
                         </div>
                     </div>
                     <div>
-                        <div className="text-3xl font-bold text-gray-900">${totalPaid.toFixed(2)}</div>
-                        <div className="text-sm text-red-500 mt-1 font-medium">${outstandingBalance.toFixed(2)} still outstanding</div>
+                        <div className="text-3xl font-bold text-gray-900">AED {totalPaid.toFixed(2)}</div>
+                        <div className="text-sm text-red-500 mt-1 font-medium">AED {outstandingBalance.toFixed(2)} still outstanding</div>
                     </div>
                 </div>
 
@@ -78,7 +78,7 @@ export default async function ProfitPage() {
                         </div>
                     </div>
                     <div className="relative z-10">
-                        <div className="text-4xl font-black text-gray-900">${totalProfit.toFixed(2)}</div>
+                        <div className="text-4xl font-black text-gray-900">AED {totalProfit.toFixed(2)}</div>
                         <div className="text-sm text-gray-500 mt-1 font-medium">Your business net generated</div>
                     </div>
                 </div>
@@ -91,7 +91,7 @@ export default async function ProfitPage() {
                         </div>
                     </div>
                     <div>
-                        <div className="text-3xl font-bold text-gray-900">${totalGovtCharges.toFixed(2)}</div>
+                        <div className="text-3xl font-bold text-gray-900">AED {totalGovtCharges.toFixed(2)}</div>
                         <div className="text-sm text-gray-500 mt-1">Held for external obligations</div>
                     </div>
                 </div>

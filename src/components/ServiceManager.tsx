@@ -17,14 +17,19 @@ export default function ServiceManager({ initialServices }: { initialServices: S
     const [govtCharge, setGovtCharge] = useState<number | ''>('')
     const [serviceCharge, setServiceCharge] = useState<number | ''>('')
 
-    const handleTotalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const val = parseFloat(e.target.value)
-        setTotalAmount(isNaN(val) ? '' : val)
+    const handleGovtChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = parseFloat(e.target.value) || 0
+        setGovtCharge(val)
+        if (typeof serviceCharge === 'number') {
+            setTotalAmount(val + serviceCharge)
+        }
     }
 
-    const handleGovtChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const val = parseFloat(e.target.value)
-        setGovtCharge(isNaN(val) ? '' : val)
+    const handleServiceChange = (val: number) => {
+        setServiceCharge(val)
+        if (typeof govtCharge === 'number') {
+            setTotalAmount(val + govtCharge)
+        }
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -113,7 +118,7 @@ export default function ServiceManager({ initialServices }: { initialServices: S
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Govt Charge</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Govt Charge (AED)</label>
                                 <input
                                     type="number"
                                     required
@@ -126,28 +131,28 @@ export default function ServiceManager({ initialServices }: { initialServices: S
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Service Charge</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Service Charge (AED)</label>
                                 <input
                                     type="number"
                                     required
                                     min="0"
                                     step="0.01"
                                     value={serviceCharge}
-                                    onChange={e => setServiceCharge(parseFloat(e.target.value))}
+                                    onChange={e => handleServiceChange(parseFloat(e.target.value) || 0)}
                                     className="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
                                     placeholder="0.00"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Total Amount</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Total Amount (AED)</label>
                                 <input
                                     type="number"
                                     required
+                                    readOnly
                                     min="0"
                                     step="0.01"
                                     value={totalAmount}
-                                    onChange={handleTotalChange}
-                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full border border-gray-200 rounded-lg px-3 py-2 outline-none bg-gray-100 cursor-not-allowed"
                                     placeholder="0.00"
                                 />
                             </div>
@@ -181,9 +186,18 @@ export default function ServiceManager({ initialServices }: { initialServices: S
                             services.map((service) => (
                                 <tr key={service.id} className="hover:bg-gray-50">
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{service.name}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right font-medium">${service.total_amount.toFixed(2)}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">${service.govt_charge.toFixed(2)}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium text-right">${service.service_charge.toFixed(2)}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right font-bold">
+                                        <span className="text-gray-500">AED </span>
+                                        {service.total_amount.toFixed(2)}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <div className="text-sm text-gray-500">
+                                            <span className="text-gray-400">Govt: </span>{service.govt_charge.toFixed(2)}
+                                        </div>
+                                        <div className="text-sm text-gray-500">
+                                            <span className="text-gray-400">Service: </span>{service.service_charge.toFixed(2)}
+                                        </div>
+                                    </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <button onClick={() => handleDelete(service.id)} className="text-red-500 hover:text-red-700 p-1">
                                             <Trash2 className="h-4 w-4" />
@@ -193,7 +207,7 @@ export default function ServiceManager({ initialServices }: { initialServices: S
                             ))
                         ) : (
                             <tr>
-                                <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
+                                <td colSpan={4} className="px-6 py-12 text-center text-gray-500">
                                     <Briefcase className="mx-auto h-12 w-12 text-gray-300 mb-3" />
                                     <p>No predefined services added yet.</p>
                                 </td>

@@ -137,8 +137,8 @@ export async function generateInvoicePdf(id: string): Promise<Uint8Array | null>
     drawText('Service', 70, tY, 10, font)
     drawText('Description', 200, tY, 10, font)
     drawText('Qty', 380, tY, 10, font)
-    drawText('Fees/Rate', 440, tY, 10, font)
-    drawText('Total', 510, tY, 10, font)
+    drawText('Fees (AED)', 440, tY, 10, font)
+    drawText('Total (AED)', 505, tY, 10, font)
 
     let yRow = yTable - 20
 
@@ -187,19 +187,19 @@ export async function generateInvoicePdf(id: string): Promise<Uint8Array | null>
     const labelX = 400
     const valueX = 510
 
-    drawText('Grand Total', labelX, yRow, 10, fontBold)
+    drawText('Grand Total (AED)', labelX - 20, yRow, 10, fontBold)
     drawText(invoice.amount.toFixed(2), valueX, yRow, 10, fontBold)
     yRow -= 20
 
     page.drawLine({ start: { x: 40, y: yRow + 10 }, end: { x: width - 40, y: yRow + 10 }, thickness: 0.5, color: rgb(0.9, 0.9, 0.9) })
 
-    drawText('Paid', labelX, yRow, 10, font)
+    drawText('Paid (AED)', labelX - 20, yRow, 10, font)
     drawText(invoice.paid.toFixed(2), valueX, yRow, 10, font)
     yRow -= 20
 
     page.drawLine({ start: { x: 40, y: yRow + 10 }, end: { x: width - 40, y: yRow + 10 }, thickness: 0.5, color: rgb(0.9, 0.9, 0.9) })
 
-    drawText('Amount Due', labelX, yRow, 10, font)
+    drawText('Amount Due (AED)', labelX - 20, yRow, 10, font)
     drawText(invoice.amount_due.toFixed(2), valueX, yRow, 10, font)
     yRow -= 20
 
