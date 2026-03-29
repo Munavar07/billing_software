@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { FileText, LogOut, PlusCircle, LayoutDashboard, User } from 'lucide-react'
+import { FileText, LogOut, PlusCircle, LayoutDashboard, User, Briefcase, Users, TrendingUp } from 'lucide-react'
 import { revalidatePath } from 'next/cache'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -41,6 +41,18 @@ export default async function DashboardLayout({ children }: { children: React.Re
                     <Link href="/dashboard/create" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors">
                         <PlusCircle className="h-5 w-5 text-gray-500" />
                         Create Invoice
+                    </Link>
+                    <Link href="/dashboard/services" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+                        <Briefcase className="h-5 w-5 text-gray-500" />
+                        Services
+                    </Link>
+                    <Link href="/dashboard/clients" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+                        <Users className="h-5 w-5 text-gray-500" />
+                        Clients
+                    </Link>
+                    <Link href="/dashboard/profit" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+                        <TrendingUp className="h-5 w-5 text-gray-500" />
+                        Profit
                     </Link>
                 </nav>
 
@@ -95,18 +107,26 @@ export default async function DashboardLayout({ children }: { children: React.Re
                 <div className="flex h-16">
                     <Link href="/dashboard" className="flex-1 flex flex-col items-center justify-center gap-1 text-gray-600 hover:text-blue-600 transition-colors active:bg-gray-50">
                         <LayoutDashboard className="h-5 w-5" />
-                        <span className="text-xs font-medium">Dashboard</span>
+                        <span className="text-[10px] sm:text-xs font-medium">Dashboard</span>
+                    </Link>
+                    <Link href="/dashboard/services" className="flex-1 flex flex-col items-center justify-center gap-1 text-gray-600 hover:text-blue-600 transition-colors active:bg-gray-50">
+                        <Briefcase className="h-5 w-5" />
+                        <span className="text-[10px] sm:text-xs font-medium">Services</span>
                     </Link>
                     <Link href="/dashboard/create" className="flex-1 flex flex-col items-center justify-center gap-1 text-gray-600 hover:text-blue-600 transition-colors active:bg-gray-50">
                         <div className="bg-blue-600 rounded-full p-2 -mt-5 shadow-lg">
                             <PlusCircle className="h-5 w-5 text-white" />
                         </div>
-                        <span className="text-xs font-medium mt-1">New Invoice</span>
+                        <span className="text-[10px] sm:text-xs font-medium mt-1">New Invoice</span>
+                    </Link>
+                    <Link href="/dashboard/profit" className="flex-1 flex flex-col items-center justify-center gap-1 text-gray-600 hover:text-blue-600 transition-colors active:bg-gray-50">
+                        <TrendingUp className="h-5 w-5" />
+                        <span className="text-[10px] sm:text-xs font-medium">Profit</span>
                     </Link>
                     <form action={handleSignOut} className="flex-1">
                         <button type="submit" className="w-full h-full flex flex-col items-center justify-center gap-1 text-gray-600 hover:text-blue-600 transition-colors active:bg-gray-50">
                             <LogOut className="h-5 w-5" />
-                            <span className="text-xs font-medium">Sign out</span>
+                            <span className="text-[10px] sm:text-xs font-medium">Sign out</span>
                         </button>
                     </form>
                 </div>

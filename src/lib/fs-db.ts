@@ -17,6 +17,15 @@ export interface Invoice {
     created_at: string
 }
 
+export interface Service {
+    id: string
+    name: string
+    total_amount: number
+    govt_charge: number
+    service_charge: number
+    created_at: string
+}
+
 export async function getInvoices(includeDeleted = false): Promise<Invoice[]> {
     const supabase = await createClient()
     let query = supabase
@@ -84,4 +93,59 @@ export async function updateInvoice(id: string, updates: Partial<Invoice>): Prom
 export async function deleteInvoice(id: string): Promise<boolean> {
     const updated = await updateInvoice(id, { is_deleted: true })
     return updated !== null
+}
+
+// -------------------------------------------------------------
+// Services CRUD
+// -------------------------------------------------------------
+
+export async function getServices(): Promise<Service[]> {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+        .from('services')
+        .select('*')
+        .order('name', { ascending: true })
+
+    if (error) {
+        console.error('Error fetching services:', error)
+        return []
+    }
+    return (data as Service[]) || []
+}
+
+export async function createService(data: Omit<Service, 'id' | 'created_at'>): Promise<Service> {
+    const supabase = await createClient()
+    const id = crypto.randomUUID()
+
+    const { data: inserted, error } = await supabase
+        .from('services')
+        .insert({ ...data, id })
+        .select()
+        .single()
+
+    if (error) throw new Error(error.message)
+    return inserted as Service
+}
+
+export async function updateService(id: string, updates: Partial<Service>): Promise<Service | null> {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+        .from('services')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single()
+
+    if (error || !data) return null
+    return data as Service
+}
+
+export async function deleteService(id: string): Promise<boolean> {
+    const supabase = await createClient()
+    const { error } = await supabase
+        .from('services')
+        .delete()
+        .eq('id', id)
+
+    return !error
 }

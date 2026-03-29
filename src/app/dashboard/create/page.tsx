@@ -1,8 +1,9 @@
 import InvoiceForm from '@/components/InvoiceForm'
-import { getInvoices } from '@/lib/fs-db'
+import { getInvoices, getServices } from '@/lib/fs-db'
 
 export default async function CreateInvoicePage() {
     const invoices = await getInvoices()
+    const services = await getServices()
     const uniqueClients = Array.from(new Set(invoices.map((i: any) => i.client_name).filter(Boolean)))
 
     let maxNumber = 0
@@ -28,7 +29,7 @@ export default async function CreateInvoicePage() {
 
     return (
         <div className="py-2">
-            <InvoiceForm knownClients={uniqueClients as string[]} nextInvoiceNumber={nextInvoiceNumber} />
+            <InvoiceForm knownClients={uniqueClients as string[]} nextInvoiceNumber={nextInvoiceNumber} services={services} />
         </div>
     )
 }

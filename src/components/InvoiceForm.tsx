@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Invoice } from '@/lib/fs-db'
+import { Invoice, Service } from '@/lib/fs-db'
 import { toast } from 'sonner'
 import { Loader2, Save, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
@@ -12,9 +12,10 @@ interface Props {
     isEdit?: boolean
     knownClients?: string[]
     nextInvoiceNumber?: string
+    services?: Service[]
 }
 
-export default function InvoiceForm({ initialData, isEdit, knownClients = [], nextInvoiceNumber = '' }: Props) {
+export default function InvoiceForm({ initialData, isEdit, knownClients = [], nextInvoiceNumber = '', services = [] }: Props) {
     const router = useRouter()
     const [loading, setLoading] = useState(false)
 
@@ -30,6 +31,8 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
         status: initialData?.status || 'Unpaid',
         hidden_remarks: initialData?.hidden_remarks || ''
     })
+
+    const [selectedServiceId, setSelectedServiceId] = useState('')
 
     useEffect(() => {
         const due = formData.amount - formData.paid
@@ -82,6 +85,23 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
         }))
     }
 
+    const handleServiceSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const id = e.target.value
+        setSelectedServiceId(id)
+        if (!id) return
+
+        const service = services.find(s => s.id === id)
+        if (service) {
+            setFormData(prev => ({
+                ...prev,
+                amount: service.total_amount,
+                commission: service.govt_charge,
+                profit: service.service_charge,
+                hidden_remarks: prev.hidden_remarks ? prev.hidden_remarks : service.name
+            }))
+        }
+    }
+
     return (
         <form onSubmit={handleSubmit} className="max-w-4xl mx-auto bg-white border border-gray-200 shadow-sm rounded-xl p-6 sm:p-8">
             <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-100">
@@ -111,6 +131,23 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
                         ))}
                     </datalist>
                 </div>
+
+                {services.length > 0 && (
+                    <div className="md:col-span-2 bg-blue-50/50 p-4 rounded-xl border border-blue-100 mb-2">
+                        <label className="block text-sm font-medium text-blue-900 mb-1">Populate from Predefined Service (Optional)</label>
+                        <select
+                            value={selectedServiceId}
+                            onChange={handleServiceSelect}
+                            className="w-full border border-blue-200 bg-white rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 py-2.5 px-3 outline-none text-blue-800"
+                        >
+                            <option value="">-- Choose a service --</option>
+                            {services.map(s => (
+                                <option key={s.id} value={s.id}>{s.name} (${s.total_amount})</option>
+                            ))}
+                        </select>
+                        <p className="text-xs text-blue-600 mt-1.5">Selecting a service will automatically fill the Total Amount, Govt Charge, and Service Charge.</p>
+                    </div>
+                )}
 
                 <div>
                     <label className="block font-medium text-gray-700 mb-1">Total Amount ($) <span className="text-red-500">*</span></label>
