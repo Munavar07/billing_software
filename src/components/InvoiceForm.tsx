@@ -35,7 +35,8 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
         profit: initialData?.profit || 0,
         commission: initialData?.commission || 0,
         status: initialData?.status || 'Unpaid',
-        hidden_remarks: initialData?.hidden_remarks || ''
+        hidden_remarks: initialData?.hidden_remarks || '',
+        invoice_description: initialData?.invoice_description || ''
     })
 
     const [selectedServiceId, setSelectedServiceId] = useState('')
@@ -129,7 +130,7 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
                 amount: service.total_amount,
                 commission: service.govt_charge,
                 profit: service.service_charge,
-                hidden_remarks: prev.hidden_remarks ? prev.hidden_remarks : service.name
+                invoice_description: service.name
             }))
         }
     }
@@ -263,8 +264,13 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
                 </div>
 
                 <div className="md:col-span-2">
-                    <label className="block font-medium text-gray-700 mb-1">Description</label>
-                    <textarea name="hidden_remarks" value={formData.hidden_remarks} onChange={handleChange} rows={3} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 py-2.5 px-3 outline-none" placeholder="Description of services..." />
+                    <label className="block font-medium text-gray-700 mb-1">Invoice Description (Shown on PDF)</label>
+                    <textarea name="invoice_description" value={formData.invoice_description} onChange={handleChange} rows={2} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 py-2.5 px-3 outline-none" placeholder="Service description for the customer..." />
+                </div>
+
+                <div className="md:col-span-2">
+                    <label className="block font-medium text-gray-700 mb-1 text-blue-600">Hidden Remarks (Dashboard Only)</label>
+                    <textarea name="hidden_remarks" value={formData.hidden_remarks} onChange={handleChange} rows={2} className="w-full border border-blue-200 bg-blue-50/30 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 py-2.5 px-3 outline-none" placeholder="Internal notes not visible on PDF..." />
                 </div>
             </div>
 

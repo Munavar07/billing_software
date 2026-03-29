@@ -164,7 +164,7 @@ export async function generateInvoicePdf(id: string): Promise<Uint8Array | null>
 
     let lineIndex = 1
     const serviceTitle = 'Professional Services'
-    const serviceDesc = invoice.hidden_remarks || `Services - ${invoice.client_name}`
+    const serviceDesc = invoice.invoice_description || `Services - ${invoice.client_name}`
     drawRow(lineIndex++, serviceTitle, serviceDesc, invoice.amount)
 
     // Totals Background Lines

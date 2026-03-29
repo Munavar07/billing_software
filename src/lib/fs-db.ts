@@ -13,6 +13,7 @@ export interface Invoice {
     status: 'Paid' | 'Partially Paid' | 'Unpaid'
     created_by: string
     hidden_remarks?: string
+    invoice_description?: string
     is_deleted: boolean
     created_at: string
 }

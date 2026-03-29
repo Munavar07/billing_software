@@ -213,6 +213,15 @@ export default function InvoiceTable({ initialInvoices }: Props) {
                                 <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                                     Svc <span className="text-slate-600">{inv.profit.toFixed(0)}</span> · Govt <span className="text-slate-600">{inv.commission.toFixed(0)}</span>
                                 </div>
+                                {inv.hidden_remarks && (
+                                    <div className="mt-2 text-[11px] font-medium text-blue-600 bg-blue-50/50 px-3 py-2 rounded-lg border border-blue-100/50">
+                                        <div className="flex items-center gap-1.5 mb-0.5">
+                                            <FileText className="w-3 h-3" />
+                                            <span className="text-[9px] font-black uppercase tracking-widest text-blue-400">Internal Remarks</span>
+                                        </div>
+                                        {inv.hidden_remarks}
+                                    </div>
+                                )}
                                 <div className="flex items-center gap-3">
                                     <button onClick={() => handleDownloadPdf(inv.id, inv.invoice_number)} className="bg-white p-2 rounded-lg shadow-sm border border-slate-100 text-blue-600 hover:text-blue-700 transition-all active:scale-95" title="Download PDF">
                                         <Download className="h-4 w-4" />
@@ -269,8 +278,8 @@ export default function InvoiceTable({ initialInvoices }: Props) {
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="text-slate-900 font-bold">{inv.client_name}</div>
                                         {inv.hidden_remarks && (
-                                            <div className="flex items-center gap-1 text-[10px] text-slate-400 mt-0.5 font-semibold">
-                                                <FileText className="w-3 h-3" /> Remarks included
+                                            <div className="text-[10px] text-blue-500 font-semibold bg-blue-50/50 px-2 py-0.5 rounded-md border border-blue-100/30 mt-1 max-w-[180px] truncate" title={inv.hidden_remarks}>
+                                                {inv.hidden_remarks}
                                             </div>
                                         )}
                                     </td>
