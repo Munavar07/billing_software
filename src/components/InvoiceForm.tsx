@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Invoice, Service } from '@/lib/fs-db'
 import { toast } from 'sonner'
+import CreatableSelect from 'react-select/creatable'
+import { addClientAction } from '@/app/dashboard/clients/actions'
 import { Loader2, Save, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
@@ -18,6 +20,9 @@ interface Props {
 export default function InvoiceForm({ initialData, isEdit, knownClients = [], nextInvoiceNumber = '', services = [] }: Props) {
     const router = useRouter()
     const [loading, setLoading] = useState(false)
+    const [clientOptions, setClientOptions] = useState(
+        knownClients.map(c => ({ value: c, label: c }))
+    )
 
     const [formData, setFormData] = useState({
         invoice_number: initialData?.invoice_number || nextInvoiceNumber,
@@ -95,11 +100,22 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
             setFormData(prev => ({
                 ...prev,
                 amount: service.total_amount,
-                commission: service.govt_charge,
-                profit: service.service_charge,
+                commission: service.govt_charge, // Govt Charge
+                profit: service.service_charge, // Service Charge
                 hidden_remarks: prev.hidden_remarks ? prev.hidden_remarks : service.name
             }))
         }
+    }
+
+    const handleClientCreate = async (inputValue: string) => {
+        setLoading(true)
+        const newOption = { label: inputValue, value: inputValue }
+        setClientOptions(prev => [...prev, newOption])
+        setFormData(prev => ({ ...prev, client_name: inputValue }))
+
+        // Try saving it explicitly to DB if clients table exists
+        await addClientAction(inputValue)
+        setLoading(false)
     }
 
     return (
@@ -122,14 +138,28 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
                     <input required type="date" name="date" value={formData.date} onChange={handleChange} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 py-2.5 px-3 outline-none" />
                 </div>
 
-                <div className="md:col-span-2">
+                <div className="md:col-span-2 relative z-20">
                     <label className="block font-medium text-gray-700 mb-1">Client Name <span className="text-red-500">*</span></label>
-                    <input list="knownClientsList" required type="text" name="client_name" value={formData.client_name} onChange={handleChange} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 py-2.5 px-3 outline-none" placeholder="John Doe" autoComplete="off" />
-                    <datalist id="knownClientsList">
-                        {knownClients.map(client => (
-                            <option key={client} value={client} />
-                        ))}
-                    </datalist>
+                    <CreatableSelect
+                        isClearable
+                        isDisabled={loading}
+                        isLoading={loading}
+                        onChange={(newValue: any) => setFormData(prev => ({ ...prev, client_name: newValue?.value || '' }))}
+                        onCreateOption={handleClientCreate}
+                        options={clientOptions}
+                        value={formData.client_name ? { label: formData.client_name, value: formData.client_name } : null}
+                        placeholder="Select or type a new client..."
+                        styles={{
+                            control: (base) => ({
+                                ...base,
+                                padding: '2px',
+                                borderRadius: '0.5rem',
+                                borderColor: '#D1D5DB',
+                                '&:hover': { borderColor: '#3B82F6' },
+                                boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
+                            })
+                        }}
+                    />
                 </div>
 
                 {services.length > 0 && (

@@ -113,19 +113,6 @@ export default function ServiceManager({ initialServices }: { initialServices: S
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Total Amount</label>
-                                <input
-                                    type="number"
-                                    required
-                                    min="0"
-                                    step="0.01"
-                                    value={totalAmount}
-                                    onChange={handleTotalChange}
-                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="0.00"
-                                />
-                            </div>
-                            <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Govt Charge</label>
                                 <input
                                     type="number"
@@ -148,6 +135,19 @@ export default function ServiceManager({ initialServices }: { initialServices: S
                                     value={serviceCharge}
                                     onChange={e => setServiceCharge(parseFloat(e.target.value))}
                                     className="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
+                                    placeholder="0.00"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Total Amount</label>
+                                <input
+                                    type="number"
+                                    required
+                                    min="0"
+                                    step="0.01"
+                                    value={totalAmount}
+                                    onChange={handleTotalChange}
+                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
                                     placeholder="0.00"
                                 />
                             </div>

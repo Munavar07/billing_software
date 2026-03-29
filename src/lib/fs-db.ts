@@ -26,6 +26,12 @@ export interface Service {
     created_at: string
 }
 
+export interface Client {
+    id: string
+    name: string
+    created_at?: string
+}
+
 export async function getInvoices(includeDeleted = false): Promise<Invoice[]> {
     const supabase = await createClient()
     let query = supabase
@@ -148,4 +154,29 @@ export async function deleteService(id: string): Promise<boolean> {
         .eq('id', id)
 
     return !error
+}
+
+// -------------------------------------------------------------
+// Clients CRUD
+// -------------------------------------------------------------
+
+export async function getClients(): Promise<Client[]> {
+    const supabase = await createClient()
+    const { data } = await supabase.from('clients').select('*').order('name')
+    return data || []
+}
+
+export async function createClientRecord(name: string): Promise<Client | null> {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+        .from('clients')
+        .insert({ name })
+        .select()
+        .single()
+
+    if (error) {
+        console.error('Error creating client:', error)
+        return null
+    }
+    return data
 }

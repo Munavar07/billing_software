@@ -1,10 +1,16 @@
 import InvoiceForm from '@/components/InvoiceForm'
-import { getInvoices, getServices } from '@/lib/fs-db'
+import { getInvoices, getServices, getClients } from '@/lib/fs-db'
 
 export default async function CreateInvoicePage() {
     const invoices = await getInvoices()
     const services = await getServices()
-    const uniqueClients = Array.from(new Set(invoices.map((i: any) => i.client_name).filter(Boolean)))
+    const dbClients = await getClients()
+
+    // Merge DB clients with any legacy clients found in existing invoices
+    const uniqueClients = Array.from(new Set([
+        ...dbClients.map(c => c.name),
+        ...invoices.map((i: any) => i.client_name)
+    ].filter(Boolean))).sort()
 
     let maxNumber = 0
     let prefix = 'INV/nat/'
