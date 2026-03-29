@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Invoice, Service } from '@/lib/fs-db'
 import { toast } from 'sonner'
+import Select from 'react-select'
 import CreatableSelect from 'react-select/creatable'
 import { addClientAction } from '@/app/dashboard/clients/actions'
 import { Loader2, Save, ArrowLeft } from 'lucide-react'
@@ -117,8 +118,7 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
         }))
     }
 
-    const handleServiceSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const id = e.target.value
+    const handleServiceSelect = (id: string) => {
         setSelectedServiceId(id)
         if (!id) return
 
@@ -192,16 +192,38 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
                 {services.length > 0 && (
                     <div className="md:col-span-2 bg-blue-50/50 p-4 rounded-xl border border-blue-100 mb-2">
                         <label className="block text-sm font-medium text-blue-900 mb-1">Populate from Predefined Service (Optional)</label>
-                        <select
-                            value={selectedServiceId}
-                            onChange={handleServiceSelect}
-                            className="w-full border border-blue-200 bg-white rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 py-2.5 px-3 outline-none text-blue-800"
-                        >
-                            <option value="">-- Choose a service --</option>
-                            {services.map(s => (
-                                <option key={s.id} value={s.id}>{s.name} (AED {s.total_amount})</option>
-                            ))}
-                        </select>
+                        <Select
+                            isClearable
+                            className="text-blue-900"
+                            placeholder="Search or choose a service..."
+                            options={services.map(s => ({
+                                value: s.id,
+                                label: `${s.name} (AED ${s.total_amount})`,
+                                service: s
+                            }))}
+                            value={selectedServiceId ? {
+                                value: selectedServiceId,
+                                label: services.find(s => s.id === selectedServiceId)?.name
+                            } : null}
+                            onChange={(option: any) => {
+                                handleServiceSelect(option?.value || '')
+                            }}
+                            styles={{
+                                control: (base) => ({
+                                    ...base,
+                                    padding: '2px',
+                                    borderRadius: '0.5rem',
+                                    borderColor: '#BFDBFE',
+                                    backgroundColor: 'white',
+                                    '&:hover': { borderColor: '#3B82F6' },
+                                    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
+                                }),
+                                menu: (base) => ({
+                                    ...base,
+                                    zIndex: 50
+                                })
+                            }}
+                        />
                         <p className="text-xs text-blue-600 mt-1.5">Selecting a service will automatically fill the Total Amount, Govt Charge, and Service Charge.</p>
                     </div>
                 )}
