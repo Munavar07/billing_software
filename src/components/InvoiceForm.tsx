@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import Select from 'react-select'
 import CreatableSelect from 'react-select/creatable'
 import { addClientAction } from '@/app/dashboard/clients/actions'
+import { addService } from '@/app/dashboard/services/actions'
 import { Loader2, Save, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
@@ -23,6 +24,13 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
     const [loading, setLoading] = useState(false)
     const [clientOptions, setClientOptions] = useState(
         knownClients.map(c => ({ value: c, label: c }))
+    )
+    const [serviceOptions, setServiceOptions] = useState(
+        services.map(s => ({
+            value: s.id,
+            label: `${s.name} (AED ${s.total_amount})`,
+            service: s
+        }))
     )
 
     const [formData, setFormData] = useState({
@@ -131,7 +139,7 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
         setSelectedServiceId(id)
         if (!id) return
 
-        const service = services.find(s => s.id === id)
+        const service = serviceOptions.find(o => o.value === id)?.service
         if (service) {
             setFormData(prev => ({
                 ...prev,
@@ -141,6 +149,33 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
                 invoice_description: service.name
             }))
         }
+    }
+
+    const handleServiceCreate = async (inputValue: string) => {
+        setLoading(true)
+        try {
+            const newService = await addService({
+                name: inputValue,
+                govt_charge: formData.commission,
+                service_charge: formData.profit,
+                total_amount: formData.amount
+            })
+
+            if (newService) {
+                const newOption = {
+                    value: newService.id,
+                    label: `${newService.name} (AED ${newService.total_amount})`,
+                    service: newService
+                }
+                setServiceOptions(prev => [...prev, newOption])
+                setSelectedServiceId(newService.id)
+                setFormData(prev => ({ ...prev, invoice_description: inputValue }))
+                toast.success(`Service "${inputValue}" saved to predefined list.`)
+            }
+        } catch (e) {
+            toast.error('Failed to save predefined service')
+        }
+        setLoading(false)
     }
 
     const handleClientCreate = async (inputValue: string) => {
@@ -212,44 +247,38 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
                     </div>
                 )}
 
-                {services.length > 0 && (
-                    <div className="md:col-span-2 bg-blue-50/50 p-4 rounded-xl border border-blue-100 mb-2">
-                        <label className="block text-sm font-medium text-blue-900 mb-1">Populate from Predefined Service (Optional)</label>
-                        <Select
-                            isClearable
-                            className="text-blue-900"
-                            placeholder="Search or choose a service..."
-                            options={services.map(s => ({
-                                value: s.id,
-                                label: `${s.name} (AED ${s.total_amount})`,
-                                service: s
-                            }))}
-                            value={selectedServiceId ? {
-                                value: selectedServiceId,
-                                label: services.find(s => s.id === selectedServiceId)?.name
-                            } : null}
-                            onChange={(option: any) => {
-                                handleServiceSelect(option?.value || '')
-                            }}
-                            styles={{
-                                control: (base) => ({
-                                    ...base,
-                                    padding: '2px',
-                                    borderRadius: '0.5rem',
-                                    borderColor: '#BFDBFE',
-                                    backgroundColor: 'white',
-                                    '&:hover': { borderColor: '#3B82F6' },
-                                    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
-                                }),
-                                menu: (base) => ({
-                                    ...base,
-                                    zIndex: 50
-                                })
-                            }}
-                        />
-                        <p className="text-xs text-blue-600 mt-1.5">Selecting a service will automatically fill the Total Amount, Govt Charge, and Service Charge.</p>
-                    </div>
-                )}
+                <div className="md:col-span-2 bg-blue-50/50 p-4 rounded-xl border border-blue-100 mb-2">
+                    <label className="block text-sm font-medium text-blue-900 mb-1">Populate from Predefined Service (Optional)</label>
+                    <CreatableSelect
+                        isClearable
+                        isDisabled={loading}
+                        isLoading={loading}
+                        className="text-blue-900"
+                        placeholder="Search or type to create a new service..."
+                        options={serviceOptions}
+                        value={selectedServiceId ? serviceOptions.find(o => o.value === selectedServiceId) : null}
+                        onChange={(option: any) => {
+                            handleServiceSelect(option?.value || '')
+                        }}
+                        onCreateOption={handleServiceCreate}
+                        styles={{
+                            control: (base) => ({
+                                ...base,
+                                padding: '2px',
+                                borderRadius: '0.5rem',
+                                borderColor: '#BFDBFE',
+                                backgroundColor: 'white',
+                                '&:hover': { borderColor: '#3B82F6' },
+                                boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
+                            }),
+                            menu: (base) => ({
+                                ...base,
+                                zIndex: 50
+                            })
+                        }}
+                    />
+                    <p className="text-xs text-blue-600 mt-1.5">Selecting a service will automatically fill the Total Amount, Govt Charge, and Service Charge.</p>
+                </div>
 
                 <div>
                     <label className="block font-medium text-gray-700 mb-1">Govt Charge (AED)</label>
