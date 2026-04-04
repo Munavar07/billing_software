@@ -48,9 +48,7 @@ export async function generateInvoicePdf(id: string): Promise<Uint8Array | null>
     drawText('BIZNET BUSINESSMEN SERVICES', 40, yLeft, 14, fontBold)
     const companyAddress = [
         'AL AIN, SANAYIA, UAE',
-        'Tel: 037343124, 037343116',
-        'Mob: 0502506244',
-        'Email: najamalthuraya207@gmail.com'
+        'Mob: +971 568304427'
     ]
     yLeft -= 15
     companyAddress.forEach(line => {
@@ -109,13 +107,8 @@ export async function generateInvoicePdf(id: string): Promise<Uint8Array | null>
     // If not, we omit. For now, matching image exactly with empty Email and hardcoded contact.
     // Let's just draw the labels.
     const contactLine = 'Contact No: '
-    // if client name has numbers, maybe extract? No, let's leave blank since we have no DB column.
-    const cWidth = fontBold.widthOfTextAtSize(contactLine, 10)
-    drawText(contactLine, rightMargin - cWidth, yRight, 10, fontBold)
-    yRight -= 14
-    const emailLine = 'Email: '
-    const emWidth = fontBold.widthOfTextAtSize(emailLine, 10)
-    drawText(emailLine, rightMargin - emWidth, yRight, 10, fontBold)
+    // contact info omitted per request
+    yRight -= 10
 
     // --- Table ---
     let yTable = height - 340
