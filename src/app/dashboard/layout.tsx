@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { FileText, LogOut, PlusCircle, LayoutDashboard, Briefcase, Users, TrendingUp, ChevronRight } from 'lucide-react'
 import { revalidatePath } from 'next/cache'
+import NavProgressBar from '@/components/NavProgressBar'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
     const supabase = await createClient()
@@ -30,6 +31,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
     return (
         <div className="min-h-screen flex bg-[#f8fafc]">
+            <NavProgressBar />
             {/* Sidebar — desktop only */}
             <aside className="w-[280px] bg-white border-r border-slate-200 hidden md:flex flex-col flex-shrink-0 z-20 sticky top-0 h-screen">
                 <div className="h-20 flex items-center px-8 border-b border-slate-100/60">
