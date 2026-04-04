@@ -76,6 +76,10 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
         setLoading(true)
 
         try {
+            if (formData.client_name && !knownClients.includes(formData.client_name)) {
+                await addClientAction(formData.client_name, newClientMobile)
+            }
+
             const url = isEdit ? `/api/invoices/${initialData?.id}` : `/api/invoices`
             const method = isEdit ? 'PUT' : 'POST'
 
@@ -180,15 +184,10 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
     }
 
     const handleClientCreate = async (inputValue: string) => {
-        setLoading(true)
+        setClientInputValue(inputValue)
         const newOption = { label: inputValue, value: inputValue }
         setClientOptions(prev => [...prev, newOption])
         setFormData(prev => ({ ...prev, client_name: inputValue }))
-
-        await addClientAction(inputValue, newClientMobile)
-        setNewClientMobile('')
-        setClientInputValue(inputValue)
-        setLoading(false)
     }
 
     return (
