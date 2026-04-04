@@ -1,21 +1,36 @@
 'use server'
 
-import { createClientRecord } from '@/lib/fs-db'
+import { createClientRecord, deleteClientRecord } from '@/lib/fs-db'
 import { revalidatePath } from 'next/cache'
 
-export async function addClientAction(name: string, mobile?: string) {
+export async function addClientAction(name: string, mobile?: string, email?: string) {
     if (!name || name.trim() === '') {
         return { error: 'Invalid name' }
     }
 
     try {
-        const client = await createClientRecord(name.trim(), mobile?.trim())
+        const client = await createClientRecord(name.trim(), mobile?.trim(), email?.trim())
         if (!client) {
             return { error: 'Failed to create client or client already exists.' }
         }
         revalidatePath('/dashboard/clients')
         revalidatePath('/dashboard/create')
         return { success: true, client }
+    } catch (e: any) {
+        return { error: e.message }
+    }
+}
+
+export async function deleteClientAction(name: string) {
+    try {
+        const success = await deleteClientRecord(name)
+        if (!success) return { error: 'Failed to delete client.' }
+
+        revalidatePath('/dashboard/clients')
+        revalidatePath('/dashboard/create')
+        revalidatePath('/dashboard/edit/[id]', 'page')
+
+        return { success: true }
     } catch (e: any) {
         return { error: e.message }
     }

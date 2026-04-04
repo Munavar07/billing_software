@@ -10,6 +10,8 @@ export default async function ClientsPage() {
     // Map to store stats
     const statsMap = new Map<string, {
         name: string
+        mobile?: string
+        email?: string
         invoiceCount: number
         totalBilled: number
         totalPaid: number
@@ -21,6 +23,8 @@ export default async function ClientsPage() {
     dbClients.forEach(c => {
         statsMap.set(c.name, {
             name: c.name,
+            mobile: c.mobile,
+            email: c.email,
             invoiceCount: 0,
             totalBilled: 0,
             totalPaid: 0,

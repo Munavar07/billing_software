@@ -49,6 +49,7 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
 
     const [selectedServiceId, setSelectedServiceId] = useState('')
     const [newClientMobile, setNewClientMobile] = useState('')
+    const [newClientEmail, setNewClientEmail] = useState('')
     const [clientInputValue, setClientInputValue] = useState('')
 
     const isNewClient = (clientInputValue && !knownClients.includes(clientInputValue)) || (formData.client_name && !knownClients.includes(formData.client_name))
@@ -77,7 +78,7 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
 
         try {
             if (formData.client_name && !knownClients.includes(formData.client_name)) {
-                await addClientAction(formData.client_name, newClientMobile)
+                await addClientAction(formData.client_name, newClientMobile, newClientEmail)
             }
 
             const url = isEdit ? `/api/invoices/${initialData?.id}` : `/api/invoices`
@@ -244,15 +245,29 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
 
                 {isNewClient && (
                     <div className="md:col-span-2 bg-blue-50/30 p-4 rounded-xl border border-blue-100 animate-in fade-in slide-in-from-top-2 duration-300">
-                        <label className="block text-xs font-bold text-blue-600 uppercase tracking-wider mb-2">New Client Mobile (Optional)</label>
-                        <input
-                            type="text"
-                            value={newClientMobile}
-                            onChange={e => setNewClientMobile(e.target.value)}
-                            className="w-full border border-blue-200 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium transition-all bg-white"
-                            placeholder="e.g. +971 50 123 4567"
-                        />
-                        <p className="text-[10px] text-blue-500 mt-1.5 font-medium italic">* This number will be saved to the new client's profile.</p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-xs font-bold text-blue-600 uppercase tracking-wider mb-2">New Client Mobile (Optional)</label>
+                                <input
+                                    type="text"
+                                    value={newClientMobile}
+                                    onChange={e => setNewClientMobile(e.target.value)}
+                                    className="w-full border border-blue-200 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium transition-all bg-white"
+                                    placeholder="e.g. +971 50 123 4567"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-blue-600 uppercase tracking-wider mb-2">New Client Email (Optional)</label>
+                                <input
+                                    type="email"
+                                    value={newClientEmail}
+                                    onChange={e => setNewClientEmail(e.target.value)}
+                                    className="w-full border border-blue-200 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium transition-all bg-white"
+                                    placeholder="client@example.com"
+                                />
+                            </div>
+                        </div>
+                        <p className="text-[10px] text-blue-500 mt-2 font-medium italic">* This information will be saved to the new client's profile.</p>
                     </div>
                 )}
 

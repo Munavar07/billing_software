@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 interface ClientStats {
     name: string
     mobile?: string
+    email?: string
     invoiceCount: number
     totalBilled: number
     totalPaid: number
@@ -23,6 +24,7 @@ export default function ClientHubManager({ initialClients }: { initialClients: C
     const [isLoading, setIsLoading] = useState(false)
     const [newName, setNewName] = useState('')
     const [newMobile, setNewMobile] = useState('')
+    const [newEmail, setNewEmail] = useState('')
 
     const handleAddClient = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -39,6 +41,7 @@ export default function ClientHubManager({ initialClients }: { initialClients: C
             const newClient: ClientStats = {
                 name: newName.trim(),
                 mobile: newMobile.trim(),
+                email: newEmail.trim(),
                 invoiceCount: 0,
                 totalBilled: 0,
                 totalPaid: 0,
@@ -48,7 +51,28 @@ export default function ClientHubManager({ initialClients }: { initialClients: C
             setClients([newClient, ...clients].sort((a, b) => a.name.localeCompare(b.name)))
             setNewName('')
             setNewMobile('')
+            setNewEmail('')
             setIsAdding(false)
+        }
+        setIsLoading(false)
+    }
+
+    const handleDeleteClient = async (name: string, e: React.MouseEvent) => {
+        e.preventDefault() // prevent navigating if it's wrapped
+        e.stopPropagation()
+
+        if (!confirm(`Are you sure you want to delete ${name}? This action cannot be undone.`)) return
+
+        setIsLoading(true)
+        const toastId = toast.loading('Deleting client...')
+        const { deleteClientAction } = await import('@/app/dashboard/clients/actions')
+        const res = await deleteClientAction(name)
+
+        if (res.error) {
+            toast.error(res.error, { id: toastId })
+        } else {
+            toast.success('Client deleted', { id: toastId })
+            setClients(clients.filter(c => c.name !== name))
         }
         setIsLoading(false)
     }
@@ -109,15 +133,27 @@ export default function ClientHubManager({ initialClients }: { initialClients: C
                                 autoFocus
                             />
                         </div>
-                        <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Mobile Number (Optional)</label>
-                            <input
-                                type="text"
-                                value={newMobile}
-                                onChange={e => setNewMobile(e.target.value)}
-                                className="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium transition-all"
-                                placeholder="e.g. +971 50 123 4567"
-                            />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Mobile Number (Optional)</label>
+                                <input
+                                    type="text"
+                                    value={newMobile}
+                                    onChange={e => setNewMobile(e.target.value)}
+                                    className="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium transition-all"
+                                    placeholder="e.g. +971 50 123 4567"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Email Address (Optional)</label>
+                                <input
+                                    type="email"
+                                    value={newEmail}
+                                    onChange={e => setNewEmail(e.target.value)}
+                                    className="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium transition-all"
+                                    placeholder="client@example.com"
+                                />
+                            </div>
                         </div>
                         <div className="flex justify-end gap-3 pt-2">
                             <button
@@ -155,11 +191,21 @@ export default function ClientHubManager({ initialClients }: { initialClients: C
                                             <div className="flex flex-col gap-0.5">
                                                 <span className="text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-100 w-fit">CLIENT PARTNER</span>
                                                 {client.mobile && <span className="text-[10px] font-bold text-blue-500">{client.mobile}</span>}
+                                                {client.email && <span className="text-[10px] font-medium text-slate-500 truncate max-w-[150px]" title={client.email}>{client.email}</span>}
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="h-8 w-8 rounded-full border border-slate-100 flex items-center justify-center text-slate-300 group-hover:text-blue-500 group-hover:border-blue-100 transition-all">
-                                        <ArrowRight className="w-4 h-4" />
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={(e) => handleDeleteClient(client.name, e)}
+                                            className="h-8 w-8 rounded-full border border-rose-100 flex items-center justify-center text-rose-300 hover:text-rose-600 hover:bg-rose-50 hover:border-rose-200 transition-all z-10 relative"
+                                            title="Delete Client"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /></svg>
+                                        </button>
+                                        <div className="h-8 w-8 rounded-full border border-slate-100 flex items-center justify-center text-slate-300 group-hover:text-blue-500 group-hover:border-blue-100 transition-all">
+                                            <ArrowRight className="w-4 h-4" />
+                                        </div>
                                     </div>
                                 </div>
 

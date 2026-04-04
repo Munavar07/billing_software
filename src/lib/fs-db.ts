@@ -31,6 +31,7 @@ export interface Client {
     id: string
     name: string
     mobile?: string
+    email?: string
     created_at?: string
 }
 
@@ -175,11 +176,11 @@ export async function getClients(): Promise<Client[]> {
     return data || []
 }
 
-export async function createClientRecord(name: string, mobile?: string): Promise<Client | null> {
+export async function createClientRecord(name: string, mobile?: string, email?: string): Promise<Client | null> {
     const supabase = await createClient()
     const { data, error } = await supabase
         .from('clients')
-        .insert({ name, mobile })
+        .insert({ name, mobile, email })
         .select()
         .single()
 
@@ -188,4 +189,18 @@ export async function createClientRecord(name: string, mobile?: string): Promise
         return null
     }
     return data
+}
+
+export async function deleteClientRecord(name: string): Promise<boolean> {
+    const supabase = await createClient()
+    const { error } = await supabase
+        .from('clients')
+        .delete()
+        .eq('name', name)
+
+    if (error) {
+        console.error('Error deleting client:', error)
+        return false
+    }
+    return true
 }
