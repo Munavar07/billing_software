@@ -187,6 +187,7 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
 
         await addClientAction(inputValue, newClientMobile)
         setNewClientMobile('')
+        setClientInputValue(inputValue)
         setLoading(false)
     }
 
@@ -216,9 +217,15 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
                         isClearable
                         isDisabled={loading}
                         isLoading={loading}
-                        onChange={(newValue: any) => setFormData(prev => ({ ...prev, client_name: newValue?.value || '' }))}
+                        onChange={(newValue: any) => {
+                            setFormData(prev => ({ ...prev, client_name: newValue?.value || '' }))
+                            setClientInputValue(newValue?.value || '')
+                        }}
                         onCreateOption={handleClientCreate}
-                        onInputChange={(val) => setClientInputValue(val)}
+                        inputValue={clientInputValue}
+                        onInputChange={(val, { action }) => {
+                            if (action === 'input-change') setClientInputValue(val)
+                        }}
                         options={clientOptions}
                         value={formData.client_name ? { label: formData.client_name, value: formData.client_name } : null}
                         isSearchable
