@@ -40,6 +40,9 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
     })
 
     const [selectedServiceId, setSelectedServiceId] = useState('')
+    const [newClientMobile, setNewClientMobile] = useState('')
+
+    const isNewClient = formData.client_name && !knownClients.includes(formData.client_name)
 
     useEffect(() => {
         const due = formData.amount - formData.paid
@@ -146,7 +149,7 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
         setClientOptions(prev => [...prev, newOption])
         setFormData(prev => ({ ...prev, client_name: inputValue }))
 
-        await addClientAction(inputValue)
+        await addClientAction(inputValue, newClientMobile)
         setLoading(false)
     }
 
@@ -194,6 +197,20 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
                         }}
                     />
                 </div>
+
+                {isNewClient && (
+                    <div className="md:col-span-2 bg-blue-50/30 p-4 rounded-xl border border-blue-100 animate-in fade-in slide-in-from-top-2 duration-300">
+                        <label className="block text-xs font-bold text-blue-600 uppercase tracking-wider mb-2">New Client Mobile (Optional)</label>
+                        <input
+                            type="text"
+                            value={newClientMobile}
+                            onChange={e => setNewClientMobile(e.target.value)}
+                            className="w-full border border-blue-200 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium transition-all bg-white"
+                            placeholder="e.g. +971 50 123 4567"
+                        />
+                        <p className="text-[10px] text-blue-500 mt-1.5 font-medium italic">* This number will be saved to the new client's profile.</p>
+                    </div>
+                )}
 
                 {services.length > 0 && (
                     <div className="md:col-span-2 bg-blue-50/50 p-4 rounded-xl border border-blue-100 mb-2">
