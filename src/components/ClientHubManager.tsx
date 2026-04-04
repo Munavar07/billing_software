@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 
 interface ClientStats {
     name: string
+    mobile?: string
     invoiceCount: number
     totalBilled: number
     totalPaid: number
@@ -21,13 +22,14 @@ export default function ClientHubManager({ initialClients }: { initialClients: C
     const [isAdding, setIsAdding] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const [newName, setNewName] = useState('')
+    const [newMobile, setNewMobile] = useState('')
 
     const handleAddClient = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!newName.trim()) return
 
         setIsLoading(true)
-        const res = await addClientAction(newName)
+        const res = await addClientAction(newName, newMobile)
 
         if (res.error) {
             toast.error(res.error)
@@ -36,6 +38,7 @@ export default function ClientHubManager({ initialClients }: { initialClients: C
             // Add to list optimistically
             const newClient: ClientStats = {
                 name: newName.trim(),
+                mobile: newMobile.trim(),
                 invoiceCount: 0,
                 totalBilled: 0,
                 totalPaid: 0,
@@ -44,6 +47,7 @@ export default function ClientHubManager({ initialClients }: { initialClients: C
             }
             setClients([newClient, ...clients].sort((a, b) => a.name.localeCompare(b.name)))
             setNewName('')
+            setNewMobile('')
             setIsAdding(false)
         }
         setIsLoading(false)
@@ -105,6 +109,16 @@ export default function ClientHubManager({ initialClients }: { initialClients: C
                                 autoFocus
                             />
                         </div>
+                        <div>
+                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Mobile Number (Optional)</label>
+                            <input
+                                type="text"
+                                value={newMobile}
+                                onChange={e => setNewMobile(e.target.value)}
+                                className="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium transition-all"
+                                placeholder="e.g. +971 50 123 4567"
+                            />
+                        </div>
                         <div className="flex justify-end gap-3 pt-2">
                             <button
                                 type="button"
@@ -138,7 +152,10 @@ export default function ClientHubManager({ initialClients }: { initialClients: C
                                         </div>
                                         <div>
                                             <h3 className="text-base font-black text-slate-900 line-clamp-1 group-hover:text-blue-600 transition-colors" title={client.name}>{client.name}</h3>
-                                            <span className="text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">CLIENT PARTNER</span>
+                                            <div className="flex flex-col gap-0.5">
+                                                <span className="text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-100 w-fit">CLIENT PARTNER</span>
+                                                {client.mobile && <span className="text-[10px] font-bold text-blue-500">{client.mobile}</span>}
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="h-8 w-8 rounded-full border border-slate-100 flex items-center justify-center text-slate-300 group-hover:text-blue-500 group-hover:border-blue-100 transition-all">

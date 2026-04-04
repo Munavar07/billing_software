@@ -3,13 +3,13 @@
 import { createClientRecord } from '@/lib/fs-db'
 import { revalidatePath } from 'next/cache'
 
-export async function addClientAction(name: string) {
+export async function addClientAction(name: string, mobile?: string) {
     if (!name || name.trim() === '') {
         return { error: 'Invalid name' }
     }
 
     try {
-        const client = await createClientRecord(name.trim())
+        const client = await createClientRecord(name.trim(), mobile?.trim())
         if (!client) {
             return { error: 'Failed to create client or client already exists.' }
         }

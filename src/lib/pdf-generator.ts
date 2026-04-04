@@ -45,12 +45,9 @@ export async function generateInvoicePdf(id: string): Promise<Uint8Array | null>
 
     // --- Header Left: Company Info ---
     let yLeft = height - 160 // giving space for the logo area
-    drawText('Najuma Althuraya', 40, yLeft, 14, fontBold)
+    drawText('BIZNET BUSINESSMEN SERVICES', 40, yLeft, 14, fontBold)
     const companyAddress = [
-        'Back side Al Massa Hotel, Clock Tower',
-        'Al Ain',
-        'Abu Dhabi',
-        'UAE',
+        'AL AIN, SANAYIA, UAE',
         'Tel: 037343124, 037343116',
         'Mob: 0502506244',
         'Email: najamalthuraya207@gmail.com'

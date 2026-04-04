@@ -30,6 +30,7 @@ export interface Service {
 export interface Client {
     id: string
     name: string
+    mobile?: string
     created_at?: string
 }
 
@@ -174,11 +175,11 @@ export async function getClients(): Promise<Client[]> {
     return data || []
 }
 
-export async function createClientRecord(name: string): Promise<Client | null> {
+export async function createClientRecord(name: string, mobile?: string): Promise<Client | null> {
     const supabase = await createClient()
     const { data, error } = await supabase
         .from('clients')
-        .insert({ name })
+        .insert({ name, mobile })
         .select()
         .single()
 
