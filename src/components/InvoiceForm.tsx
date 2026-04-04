@@ -49,8 +49,9 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
 
     const [selectedServiceId, setSelectedServiceId] = useState('')
     const [newClientMobile, setNewClientMobile] = useState('')
+    const [clientInputValue, setClientInputValue] = useState('')
 
-    const isNewClient = formData.client_name && !knownClients.includes(formData.client_name)
+    const isNewClient = (clientInputValue && !knownClients.includes(clientInputValue)) || (formData.client_name && !knownClients.includes(formData.client_name))
 
     useEffect(() => {
         const due = formData.amount - formData.paid
@@ -185,6 +186,7 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
         setFormData(prev => ({ ...prev, client_name: inputValue }))
 
         await addClientAction(inputValue, newClientMobile)
+        setNewClientMobile('')
         setLoading(false)
     }
 
@@ -216,6 +218,7 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
                         isLoading={loading}
                         onChange={(newValue: any) => setFormData(prev => ({ ...prev, client_name: newValue?.value || '' }))}
                         onCreateOption={handleClientCreate}
+                        onInputChange={(val) => setClientInputValue(val)}
                         options={clientOptions}
                         value={formData.client_name ? { label: formData.client_name, value: formData.client_name } : null}
                         isSearchable
