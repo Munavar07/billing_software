@@ -50,6 +50,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
                         <Link
                             key={item.href}
                             href={item.href}
+                            prefetch={true}
                             className="flex items-center justify-between group px-4 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-blue-600 transition-all duration-200 border border-transparent hover:border-slate-100"
                         >
                             <div className="flex items-center gap-3">
@@ -116,21 +117,21 @@ export default async function DashboardLayout({ children }: { children: React.Re
             {/* Mobile Bottom Navigation — sophisticated redesign */}
             <nav className="md:hidden fixed bottom-6 left-4 right-4 bg-white/90 backdrop-blur-xl border border-slate-200 z-50 shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-2xl overflow-hidden">
                 <div className="flex items-center h-16">
-                    <Link href="/dashboard" className="flex-1 flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-blue-600 transition-colors">
+                    <Link href="/dashboard" prefetch={true} className="flex-1 flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-blue-600 transition-colors">
                         <LayoutDashboard className="h-5 w-5" />
                         <span className="text-[10px] font-bold">Overview</span>
                     </Link>
-                    <Link href="/dashboard/services" className="flex-1 flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-blue-600 transition-colors">
+                    <Link href="/dashboard/services" prefetch={true} className="flex-1 flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-blue-600 transition-colors">
                         <Briefcase className="h-5 w-5" />
                         <span className="text-[10px] font-bold">Services</span>
                     </Link>
-                    <Link href="/dashboard/create" className="flex-1 flex flex-col items-center justify-center gap-1 -mt-8">
+                    <Link href="/dashboard/create" prefetch={true} className="flex-1 flex flex-col items-center justify-center gap-1 -mt-8">
                         <div className="bg-blue-600 rounded-2xl p-3.5 shadow-xl shadow-blue-200 border-4 border-white">
                             <PlusCircle className="h-6 w-6 text-white" />
                         </div>
                         <span className="text-[10px] font-bold text-blue-600 mt-1">New</span>
                     </Link>
-                    <Link href="/dashboard/profit" className="flex-1 flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-blue-600 transition-colors">
+                    <Link href="/dashboard/profit" prefetch={true} className="flex-1 flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-blue-600 transition-colors">
                         <TrendingUp className="h-5 w-5" />
                         <span className="text-[10px] font-bold">Profit</span>
                     </Link>

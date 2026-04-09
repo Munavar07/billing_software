@@ -34,9 +34,9 @@ export default function NavProgressBar() {
                                 clearInterval(interval)
                                 return 90
                             }
-                            return prev + 5
+                            return prev + 15
                         })
-                    }, 100)
+                    }, 50)
 
                         // Store interval to clear it on cleanup
                         ; (window as any)._navInterval = interval
@@ -58,7 +58,7 @@ export default function NavProgressBar() {
             const timeout = setTimeout(() => {
                 setIsVisible(false)
                 setProgress(0)
-            }, 300)
+            }, 50)
             return () => clearTimeout(timeout)
         }
         if ((window as any)._navInterval) clearInterval((window as any)._navInterval)
