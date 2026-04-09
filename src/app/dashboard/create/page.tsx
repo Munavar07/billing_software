@@ -35,7 +35,7 @@ export default async function CreateInvoicePage() {
 
     return (
         <div className="py-2">
-            <InvoiceForm knownClients={uniqueClients as string[]} dbClients={dbClients} nextInvoiceNumber={nextInvoiceNumber} services={services} />
+            <InvoiceForm knownClients={uniqueClients as string[]} nextInvoiceNumber={nextInvoiceNumber} services={services} />
         </div>
     )
 }

@@ -21,6 +21,7 @@ export default function ClientHubManager({ initialClients }: { initialClients: C
     const [clients, setClients] = useState<ClientStats[]>(initialClients)
     const [searchTerm, setSearchTerm] = useState('')
     const [isAdding, setIsAdding] = useState(false)
+    const [editingClientName, setEditingClientName] = useState<string | null>(null)
     const [isLoading, setIsLoading] = useState(false)
     const [newName, setNewName] = useState('')
     const [newMobile, setNewMobile] = useState('')
@@ -31,30 +32,59 @@ export default function ClientHubManager({ initialClients }: { initialClients: C
         if (!newName.trim()) return
 
         setIsLoading(true)
-        const res = await addClientAction(newName, newMobile)
+        if (editingClientName) {
+            const { editClientAction } = await import('@/app/dashboard/clients/actions')
+            const res = await editClientAction(editingClientName, { mobile: newMobile.trim(), email: newEmail.trim() })
 
-        if (res.error) {
-            toast.error(res.error)
-        } else {
-            toast.success('Client added successfully')
-            // Add to list optimistically
-            const newClient: ClientStats = {
-                name: newName.trim(),
-                mobile: newMobile.trim(),
-                email: newEmail.trim(),
-                invoiceCount: 0,
-                totalBilled: 0,
-                totalPaid: 0,
-                totalDue: 0,
-                totalProfit: 0
+            if (res.error) {
+                toast.error(res.error)
+            } else {
+                toast.success('Client updated successfully')
+                setClients(clients.map(c => 
+                    c.name === editingClientName 
+                        ? { ...c, mobile: newMobile.trim(), email: newEmail.trim() } 
+                        : c
+                ).sort((a, b) => a.name.localeCompare(b.name)))
+                cancelEdit()
             }
-            setClients([newClient, ...clients].sort((a, b) => a.name.localeCompare(b.name)))
-            setNewName('')
-            setNewMobile('')
-            setNewEmail('')
-            setIsAdding(false)
+        } else {
+            const res = await addClientAction(newName, newMobile)
+
+            if (res.error) {
+                toast.error(res.error)
+            } else {
+                toast.success('Client added successfully')
+                const newClient: ClientStats = {
+                    name: newName.trim(),
+                    mobile: newMobile.trim(),
+                    email: newEmail.trim(),
+                    invoiceCount: 0,
+                    totalBilled: 0,
+                    totalPaid: 0,
+                    totalDue: 0,
+                    totalProfit: 0
+                }
+                setClients([newClient, ...clients].sort((a, b) => a.name.localeCompare(b.name)))
+                cancelEdit()
+            }
         }
         setIsLoading(false)
+    }
+
+    const startEdit = (client: ClientStats) => {
+        setEditingClientName(client.name)
+        setNewName(client.name)
+        setNewMobile(client.mobile || '')
+        setNewEmail(client.email || '')
+        setIsAdding(true)
+    }
+
+    const cancelEdit = () => {
+        setEditingClientName(null)
+        setNewName('')
+        setNewMobile('')
+        setNewEmail('')
+        setIsAdding(false)
     }
 
     const handleDeleteClient = async (name: string, e: React.MouseEvent) => {
@@ -116,9 +146,9 @@ export default function ClientHubManager({ initialClients }: { initialClients: C
                 <div className="bg-white p-8 rounded-3xl border border-neutral-200 shadow-[0_8px_30px_rgb(0,0,0,0.06)] animate-in fade-in slide-in-from-top-4 duration-300 max-w-lg">
                     <div className="flex items-center gap-3 mb-8">
                         <div className="p-2.5 bg-neutral-100 rounded-full text-zinc-950 border border-neutral-200">
-                            <Users className="h-4 w-4" />
+                            {editingClientName ? <Users className="h-4 w-4" /> : <PlusCircle className="h-4 w-4" />}
                         </div>
-                        <h3 className="text-xl font-bold text-zinc-950 tracking-tight">New Client Partner</h3>
+                        <h3 className="text-xl font-bold text-zinc-950 tracking-tight">{editingClientName ? 'Edit Client Partner' : 'New Client Partner'}</h3>
                     </div>
                     <form onSubmit={handleAddClient} className="space-y-8">
                         <div>
@@ -126,11 +156,12 @@ export default function ClientHubManager({ initialClients }: { initialClients: C
                             <input
                                 type="text"
                                 required
+                                disabled={!!editingClientName}
                                 value={newName}
                                 onChange={e => setNewName(e.target.value)}
-                                className="w-full border-b-2 border-neutral-200 bg-transparent px-0 py-2 outline-none focus:border-zinc-950 text-zinc-950 text-lg font-semibold transition-all placeholder:text-neutral-300"
+                                className={`w-full border-b-2 border-neutral-200 bg-transparent px-0 py-2 outline-none focus:border-zinc-950 text-zinc-950 text-lg font-semibold transition-all placeholder:text-neutral-300 ${editingClientName ? 'opacity-60 cursor-not-allowed' : ''}`}
                                 placeholder="Enter legal client name..."
-                                autoFocus
+                                autoFocus={!editingClientName}
                             />
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -158,7 +189,7 @@ export default function ClientHubManager({ initialClients }: { initialClients: C
                         <div className="flex justify-end gap-4 pt-4 border-t border-neutral-100">
                             <button
                                 type="button"
-                                onClick={() => setIsAdding(false)}
+                                onClick={cancelEdit}
                                 className="px-6 py-2.5 rounded-full text-sm font-bold text-zinc-500 hover:text-zinc-900 hover:bg-neutral-100 transition-colors"
                             >
                                 Cancel
@@ -198,13 +229,20 @@ export default function ClientHubManager({ initialClients }: { initialClients: C
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <button
+                                            onClick={(e) => { e.preventDefault(); startEdit(client); }}
+                                            className="h-8 w-8 rounded-full border border-neutral-200 flex items-center justify-center text-zinc-400 hover:text-zinc-950 hover:bg-neutral-50 transition-all z-10 relative"
+                                            title="Edit Client"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                                        </button>
+                                        <button
                                             onClick={(e) => handleDeleteClient(client.name, e)}
                                             className="h-8 w-8 rounded-full border border-rose-100 flex items-center justify-center text-rose-300 hover:text-rose-600 hover:bg-rose-50 transition-all z-10 relative"
                                             title="Delete Client"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /></svg>
                                         </button>
-                                        <div className="h-8 w-8 rounded-full border border-neutral-200 flex items-center justify-center text-zinc-300 group-hover:text-zinc-950 group-hover:border-zinc-950 transition-all">
+                                        <div className="hidden sm:flex h-8 w-8 rounded-full border border-neutral-200 items-center justify-center text-zinc-300 group-hover:text-zinc-950 group-hover:border-zinc-950 transition-all ml-1">
                                             <ArrowRight className="w-4 h-4" />
                                         </div>
                                     </div>

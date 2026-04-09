@@ -1,6 +1,6 @@
 'use server'
 
-import { createClientRecord, deleteClientRecord } from '@/lib/fs-db'
+import { createClientRecord, deleteClientRecord, updateClientRecord } from '@/lib/fs-db'
 import { revalidatePath } from 'next/cache'
 
 export async function addClientAction(name: string, mobile?: string, email?: string) {
@@ -31,6 +31,21 @@ export async function deleteClientAction(name: string) {
         revalidatePath('/dashboard/edit/[id]', 'page')
 
         return { success: true }
+    } catch (e: any) {
+        return { error: e.message }
+    }
+}
+
+export async function editClientAction(name: string, updates: { mobile?: string, email?: string }) {
+    try {
+        const client = await updateClientRecord(name, updates)
+        if (!client) return { error: 'Failed to update client.' }
+
+        revalidatePath('/dashboard/clients')
+        revalidatePath('/dashboard/create')
+        revalidatePath('/dashboard/edit/[id]', 'page')
+
+        return { success: true, client }
     } catch (e: any) {
         return { error: e.message }
     }
