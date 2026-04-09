@@ -40,37 +40,37 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-[#FAFAFA] flex flex-col justify-center py-12 sm:px-6 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
                 <div className="flex justify-center">
-                    <div className="h-12 w-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-                        <FileText className="h-6 w-6 text-white" />
+                    <div className="bg-zinc-950 rounded-full p-4 shadow-[0_20px_50px_rgba(0,0,0,0.1)]">
+                        <FileText className="h-8 w-8 text-white" />
                     </div>
                 </div>
-                <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                    Sign in to your account
+                <h2 className="mt-8 text-center text-4xl font-black text-zinc-950 tracking-tighter">
+                    Welcome Back
                 </h2>
-                <p className="mt-2 text-center text-sm text-gray-600">
-                    Access your professional invoice management system
+                <p className="mt-2 text-center text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
+                    Secure Invoice Management System
                 </p>
             </div>
 
-            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="bg-white py-8 px-4 shadow-xl sm:rounded-2xl sm:px-10 border border-gray-100">
-                    <form className="space-y-6" onSubmit={handleSubmit}>
+            <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-md">
+                <div className="bg-white py-10 px-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-[40px] sm:px-12 border border-neutral-100 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <form className="space-y-8" onSubmit={handleSubmit}>
                         {error && (
-                            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+                            <div className="bg-rose-50 border border-rose-100 text-rose-600 px-5 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest">
                                 {error}
                             </div>
                         )}
 
                         <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                                Email address
+                            <label htmlFor="email" className="block text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-3 ml-1">
+                                Email Address
                             </label>
-                            <div className="mt-1 relative rounded-md shadow-sm">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Mail className="h-5 w-5 text-gray-400" />
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                                    <Mail className="h-4 w-4 text-zinc-400" />
                                 </div>
                                 <input
                                     id="email"
@@ -78,19 +78,19 @@ export default function LoginPage() {
                                     type="email"
                                     autoComplete="email"
                                     required
-                                    className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-lg py-3 border outline-none transition-colors"
+                                    className="block w-full pl-12 pr-5 py-4 bg-neutral-50 border border-neutral-100 rounded-full text-sm font-medium outline-none focus:ring-2 focus:ring-zinc-950/5 focus:border-zinc-950 transition-all text-zinc-950"
                                     placeholder="admin@example.com"
                                 />
                             </div>
                         </div>
 
                         <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                                Password
+                            <label htmlFor="password" className="block text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-3 ml-1">
+                                Your Password
                             </label>
-                            <div className="mt-1 relative rounded-md shadow-sm">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Lock className="h-5 w-5 text-gray-400" />
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                                    <Lock className="h-4 w-4 text-zinc-400" />
                                 </div>
                                 <input
                                     id="password"
@@ -98,39 +98,37 @@ export default function LoginPage() {
                                     type="password"
                                     autoComplete="current-password"
                                     required
-                                    className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-lg py-3 border outline-none transition-colors"
+                                    className="block w-full pl-12 pr-5 py-4 bg-neutral-50 border border-neutral-100 rounded-full text-sm font-medium outline-none focus:ring-2 focus:ring-zinc-950/5 focus:border-zinc-950 transition-all text-zinc-950"
                                     placeholder="••••••••"
                                 />
                             </div>
                         </div>
 
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center">
-                                <input
-                                    id="remember-me"
-                                    name="remember-me"
-                                    type="checkbox"
-                                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                />
-                                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                                    Remember me
-                                </label>
-                            </div>
+                        <div className="flex items-center">
+                            <input
+                                id="remember-me"
+                                name="remember-me"
+                                type="checkbox"
+                                className="h-4 w-4 text-zinc-950 focus:ring-zinc-950 border-neutral-200 rounded-full"
+                            />
+                            <label htmlFor="remember-me" className="ml-3 block text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                                Remember Device
+                            </label>
                         </div>
 
-                        <div>
+                        <div className="pt-2">
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                className="w-full flex justify-center items-center py-4 px-6 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.12)] text-xs font-black uppercase tracking-[0.2em] text-white bg-zinc-950 hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-950 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95 translate-y-0 hover:-translate-y-1"
                             >
                                 {isLoading ? (
                                     <>
-                                        <Loader2 className="animate-spin -ml-1 mr-2 h-5 w-5" />
-                                        Signing in...
+                                        <Loader2 className="animate-spin -ml-1 mr-3 h-4 w-4" />
+                                        Processing...
                                     </>
                                 ) : (
-                                    'Sign in'
+                                    'Access Dashboard'
                                 )}
                             </button>
                         </div>
