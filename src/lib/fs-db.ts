@@ -178,17 +178,38 @@ export async function getClients(): Promise<Client[]> {
 
 export async function createClientRecord(name: string, mobile?: string, email?: string): Promise<Client | null> {
     const supabase = await createClient()
-    const { data, error } = await supabase
-        .from('clients')
-        .insert({ name, mobile, email })
-        .select()
-        .single()
 
-    if (error) {
-        console.error('Error creating client:', error)
-        return null
+    // check if exists
+    const { data: existing } = await supabase.from('clients').select('id').eq('name', name).single()
+
+    if (existing) {
+        // Update
+        const { data, error } = await supabase
+            .from('clients')
+            .update({ mobile, email })
+            .eq('name', name)
+            .select()
+            .single()
+
+        if (error) {
+            console.error('Error updating client:', error)
+            return null
+        }
+        return data as Client
+    } else {
+        // Insert
+        const { data, error } = await supabase
+            .from('clients')
+            .insert([{ name, mobile, email }])
+            .select()
+            .single()
+
+        if (error) {
+            console.error('Error creating client:', error)
+            return null
+        }
+        return data as Client
     }
-    return data
 }
 
 export async function deleteClientRecord(name: string): Promise<boolean> {

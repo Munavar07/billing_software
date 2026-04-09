@@ -15,11 +15,12 @@ interface Props {
     initialData?: Invoice
     isEdit?: boolean
     knownClients?: string[]
+    dbClients?: any[]
     nextInvoiceNumber?: string
     services?: Service[]
 }
 
-export default function InvoiceForm({ initialData, isEdit, knownClients = [], nextInvoiceNumber = '', services = [] }: Props) {
+export default function InvoiceForm({ initialData, isEdit, knownClients = [], dbClients = [], nextInvoiceNumber = '', services = [] }: Props) {
     const router = useRouter()
     const [loading, setLoading] = useState(false)
     const [clientOptions, setClientOptions] = useState(
@@ -52,7 +53,21 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
     const [newClientEmail, setNewClientEmail] = useState('')
     const [clientInputValue, setClientInputValue] = useState('')
 
-    const isNewClient = (clientInputValue && !knownClients.includes(clientInputValue)) || (formData.client_name && !knownClients.includes(formData.client_name))
+    const isClientSelected = (clientInputValue && clientInputValue.trim().length > 0) || (formData.client_name && formData.client_name.trim().length > 0)
+
+    useEffect(() => {
+        // If client changes, prefill contact info if we know them
+        if (formData.client_name && dbClients.length > 0) {
+            const dbRef = dbClients.find(c => c.name === formData.client_name)
+            if (dbRef) {
+                setNewClientMobile(dbRef.mobile || '')
+                setNewClientEmail(dbRef.email || '')
+            } else {
+                setNewClientMobile('')
+                setNewClientEmail('')
+            }
+        }
+    }, [formData.client_name, dbClients])
 
     useEffect(() => {
         const due = formData.amount - formData.paid
@@ -77,7 +92,8 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
         setLoading(true)
 
         try {
-            if (formData.client_name && !knownClients.includes(formData.client_name)) {
+            if (formData.client_name) {
+                // This upserts the client so that if they exist, phone/email gets updated.
                 await addClientAction(formData.client_name, newClientMobile, newClientEmail)
             }
 
@@ -239,36 +255,49 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
                                 '&:hover': { borderColor: '#09090b' },
                                 boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
                                 zIndex: 30
+                            }),
+                            singleValue: (base) => ({
+                                ...base,
+                                color: '#09090b',
+                                fontWeight: 500
+                            }),
+                            input: (base) => ({
+                                ...base,
+                                color: '#09090b'
                             })
                         }}
                     />
                 </div>
 
-                {isNewClient && (
+                {isClientSelected && (
                     <div className="md:col-span-2 bg-[#FAFAFA] p-6 rounded-3xl border border-neutral-200 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
+                        <div className="flex items-center gap-2 mb-4">
+                            <h4 className="text-sm font-black text-zinc-950 uppercase tracking-widest">Client Contact Details</h4>
+                            <span className="bg-zinc-100 text-zinc-500 text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full">Optional</span>
+                        </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label className="block text-xs font-black text-zinc-400 uppercase tracking-widest mb-3">New Client Mobile <span className="text-neutral-300">(Optional)</span></label>
+                                <label className="block text-xs font-black text-zinc-400 uppercase tracking-widest mb-3">Mobile Contact</label>
                                 <input
                                     type="text"
                                     value={newClientMobile}
                                     onChange={e => setNewClientMobile(e.target.value)}
-                                    className="w-full border border-neutral-200 rounded-full px-5 py-3 outline-none focus:ring-2 focus:ring-zinc-950/10 focus:border-zinc-950 font-medium transition-all bg-white shadow-sm"
+                                    className="w-full border border-neutral-200 rounded-full px-5 py-3 outline-none focus:ring-2 focus:ring-zinc-950/10 focus:border-zinc-950 font-medium transition-all bg-white shadow-sm text-zinc-950"
                                     placeholder="e.g. +971 50 123 4567"
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs font-black text-zinc-400 uppercase tracking-widest mb-3">New Client Email <span className="text-neutral-300">(Optional)</span></label>
+                                <label className="block text-xs font-black text-zinc-400 uppercase tracking-widest mb-3">Email Address</label>
                                 <input
                                     type="email"
                                     value={newClientEmail}
                                     onChange={e => setNewClientEmail(e.target.value)}
-                                    className="w-full border border-neutral-200 rounded-full px-5 py-3 outline-none focus:ring-2 focus:ring-zinc-950/10 focus:border-zinc-950 font-medium transition-all bg-white shadow-sm"
+                                    className="w-full border border-neutral-200 rounded-full px-5 py-3 outline-none focus:ring-2 focus:ring-zinc-950/10 focus:border-zinc-950 font-medium transition-all bg-white shadow-sm text-zinc-950"
                                     placeholder="client@example.com"
                                 />
                             </div>
                         </div>
-                        <p className="text-[10px] text-zinc-500 mt-4 font-bold italic tracking-wide">* This info will be automatically added to the clients directory.</p>
+                        <p className="text-[10px] text-zinc-500 mt-5 font-bold italic tracking-wide">* Changes here will be saved back directly to the client's profile.</p>
                     </div>
                 )}
 
@@ -299,6 +328,15 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
                             menu: (base) => ({
                                 ...base,
                                 zIndex: 50
+                            }),
+                            singleValue: (base) => ({
+                                ...base,
+                                color: '#09090b',
+                                fontWeight: 500
+                            }),
+                            input: (base) => ({
+                                ...base,
+                                color: '#09090b'
                             })
                         }}
                     />

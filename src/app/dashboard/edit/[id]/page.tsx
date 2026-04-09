@@ -20,7 +20,7 @@ export default async function EditInvoicePage({ params }: { params: Promise<{ id
 
     return (
         <div className="py-2">
-            <InvoiceForm initialData={invoice} isEdit services={services} knownClients={uniqueClients as string[]} />
+            <InvoiceForm initialData={invoice} isEdit services={services} knownClients={uniqueClients as string[]} dbClients={dbClients} />
         </div>
     )
 }
