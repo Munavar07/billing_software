@@ -201,6 +201,12 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
             if (item.id !== id) return item
             const updated = { ...item, ...updates }
 
+            if ('govt_charge' in updates || 'service_charge' in updates) {
+                updated.rate = (updated.govt_charge || 0) + (updated.service_charge || 0)
+            } else if ('rate' in updates) {
+                updated.service_charge = (updated.rate || 0) - (updated.govt_charge || 0)
+            }
+
             // Recalculate total for this item
             const rate = updated.rate || 0
             const qty = updated.qty || 1
@@ -386,7 +392,25 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
                                                         type="number"
                                                         value={item.rate}
                                                         onChange={e => updateLineItem(item.id, { rate: parseFloat(e.target.value) || 0 })}
-                                                        className="w-20 bg-neutral-50 rounded-full px-3 py-0.5 text-[10px] font-black text-zinc-950 outline-none focus:ring-1 focus:ring-zinc-950"
+                                                        className="w-16 bg-neutral-50 rounded-full px-2 py-0.5 text-[10px] font-black text-zinc-950 outline-none focus:ring-1 focus:ring-zinc-950"
+                                                    />
+                                                </div>
+                                                <div className="flex items-center gap-1.5">
+                                                    <label className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Govt</label>
+                                                    <input
+                                                        type="number"
+                                                        value={item.govt_charge}
+                                                        onChange={e => updateLineItem(item.id, { govt_charge: parseFloat(e.target.value) || 0 })}
+                                                        className="w-16 bg-neutral-50 rounded-full px-2 py-0.5 text-[10px] font-black text-zinc-950 outline-none focus:ring-1 focus:ring-zinc-950"
+                                                    />
+                                                </div>
+                                                <div className="flex items-center gap-1.5">
+                                                    <label className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Srvc</label>
+                                                    <input
+                                                        type="number"
+                                                        value={item.service_charge}
+                                                        onChange={e => updateLineItem(item.id, { service_charge: parseFloat(e.target.value) || 0 })}
+                                                        className="w-16 bg-neutral-50 rounded-full px-2 py-0.5 text-[10px] font-black text-zinc-950 outline-none focus:ring-1 focus:ring-zinc-950"
                                                     />
                                                 </div>
                                             </div>
