@@ -30,50 +30,50 @@ export default async function DashboardLayout({ children }: { children: React.Re
     ]
 
     return (
-        <div className="min-h-screen flex bg-[#f8fafc]">
+        <div className="min-h-screen flex bg-[#FAFAFA]">
             <NavProgressBar />
             {/* Sidebar — desktop only */}
-            <aside className="w-[280px] bg-white border-r border-slate-200 hidden md:flex flex-col flex-shrink-0 z-20 sticky top-0 h-screen">
-                <div className="h-20 flex items-center px-8 border-b border-slate-100/60">
+            <aside className="w-[280px] bg-white/70 backdrop-blur-2xl border-r border-neutral-200/60 hidden md:flex flex-col flex-shrink-0 z-20 sticky top-0 h-screen">
+                <div className="h-20 flex items-center px-8 border-b border-neutral-200/50">
                     <Link href="/dashboard" className="flex items-center gap-3 group">
-                        <div className="bg-blue-600 rounded-xl p-2 shadow-lg shadow-blue-200 group-hover:scale-105 transition-transform duration-200">
-                            <FileText className="h-6 w-6 text-white" />
+                        <div className="bg-zinc-950 rounded-full p-2.5 shadow-md shadow-zinc-200 group-hover:scale-105 transition-all duration-300">
+                            <FileText className="h-5 w-5 text-white" />
                         </div>
-                        <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700 tracking-tight">
+                        <span className="text-xl font-bold text-zinc-950 tracking-tight">
                             InvoicePro
                         </span>
                     </Link>
                 </div>
 
-                <nav className="flex-1 px-4 py-8 space-y-1.5 overflow-y-auto">
+                <nav className="flex-1 px-4 py-8 space-y-2 overflow-y-auto">
                     {navItems.map((item) => (
                         <Link
                             key={item.href}
                             href={item.href}
                             prefetch={true}
-                            className="flex items-center justify-between group px-4 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-blue-600 transition-all duration-200 border border-transparent hover:border-slate-100"
+                            className="flex items-center justify-between group px-4 py-3 rounded-2xl text-sm font-semibold text-zinc-500 hover:bg-zinc-950 hover:text-white transition-all duration-300"
                         >
                             <div className="flex items-center gap-3">
-                                <item.icon className="h-5 w-5 text-slate-400 group-hover:text-blue-500 transition-colors" />
+                                <item.icon className="h-5 w-5 text-zinc-400 group-hover:text-white transition-colors" />
                                 <span>{item.label}</span>
                             </div>
-                            <ChevronRight className="h-4 w-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 text-blue-400" />
+                            <ChevronRight className="h-4 w-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-white" />
                         </Link>
                     ))}
                 </nav>
 
-                <div className="p-6 mt-auto border-t border-slate-100/60 bg-slate-50/30">
+                <div className="p-6 mt-auto border-t border-neutral-200/50 bg-[#FAFAFA]/50">
                     <div className="flex items-center gap-3 mb-4">
-                        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-md">
-                            <span className="font-bold text-sm">{user.email?.charAt(0).toUpperCase()}</span>
+                        <div className="h-10 w-10 rounded-full bg-zinc-100 border border-zinc-200 flex items-center justify-center text-zinc-950 shadow-sm">
+                            <span className="font-bold text-sm tracking-tight">{user.email?.charAt(0).toUpperCase()}</span>
                         </div>
                         <div className="flex-1 min-w-0">
-                            <p className="text-sm font-bold text-slate-900 truncate">Admin User</p>
-                            <p className="text-xs text-slate-500 truncate font-medium">{user.email}</p>
+                            <p className="text-sm font-bold text-zinc-950 truncate tracking-tight">Admin User</p>
+                            <p className="text-xs text-zinc-500 truncate font-medium">{user.email}</p>
                         </div>
                     </div>
                     <form action={handleSignOut}>
-                        <button type="submit" className="w-full flex items-center justify-center gap-2 text-sm font-semibold text-slate-600 hover:text-red-600 hover:bg-red-50 py-2.5 rounded-xl transition-all duration-200 border border-transparent hover:border-red-100">
+                        <button type="submit" className="w-full flex items-center justify-center gap-2 text-sm font-bold text-zinc-600 hover:text-white hover:bg-zinc-950 py-2.5 rounded-full transition-all duration-300">
                             <LogOut className="h-4 w-4" />
                             <span>Sign Out</span>
                         </button>
@@ -84,19 +84,19 @@ export default async function DashboardLayout({ children }: { children: React.Re
             {/* Main Content */}
             <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
                 {/* Top Navbar */}
-                <header className="h-16 bg-white/80 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-6 sm:px-8 lg:px-10 z-10 sticky top-0">
+                <header className="h-16 glass border-b border-neutral-200/50 flex items-center justify-between px-6 sm:px-8 lg:px-10 z-10 sticky top-0 transition-all">
                     <div className="flex items-center gap-3">
                         {/* Mobile logo */}
                         <div className="flex md:hidden items-center gap-2">
-                            <div className="bg-blue-600 rounded-lg p-1.5 shadow-md">
-                                <FileText className="h-5 w-5 text-white" />
+                            <div className="bg-zinc-950 rounded-full p-2 shadow-sm">
+                                <FileText className="h-4 w-4 text-white" />
                             </div>
-                            <span className="font-bold text-slate-900 tracking-tight text-lg">InvoicePro</span>
+                            <span className="font-bold text-zinc-950 tracking-tight text-lg">InvoicePro</span>
                         </div>
-                        <div className="hidden md:flex items-center gap-2 text-slate-400">
+                        <div className="hidden md:flex items-center gap-2 text-zinc-400">
                             <LayoutDashboard className="h-4 w-4" />
-                            <span className="text-sm font-bold">/</span>
-                            <span className="text-sm font-bold text-slate-900">Dashboard</span>
+                            <span className="text-sm font-medium">/</span>
+                            <span className="text-sm font-bold text-zinc-950 tracking-tight">Dashboard</span>
                         </div>
                     </div>
 
@@ -114,31 +114,30 @@ export default async function DashboardLayout({ children }: { children: React.Re
                 </main>
             </div>
 
-            {/* Mobile Bottom Navigation — sophisticated redesign */}
-            <nav className="md:hidden fixed bottom-6 left-4 right-4 bg-white/90 backdrop-blur-xl border border-slate-200 z-50 shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-2xl overflow-hidden">
+            {/* Mobile Bottom Navigation */}
+            <nav className="md:hidden fixed bottom-6 left-4 right-4 glass border border-neutral-200/50 z-50 shadow-[0_8px_30px_rgb(0,0,0,0.06)] rounded-full overflow-hidden">
                 <div className="flex items-center h-16">
-                    <Link href="/dashboard" prefetch={true} className="flex-1 flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-blue-600 transition-colors">
+                    <Link href="/dashboard" prefetch={true} className="flex-1 flex flex-col items-center justify-center gap-1 text-zinc-400 hover:text-zinc-950 transition-colors">
                         <LayoutDashboard className="h-5 w-5" />
-                        <span className="text-[10px] font-bold">Overview</span>
+                        <span className="text-[10px] font-bold uppercase tracking-widest mt-0.5">Home</span>
                     </Link>
-                    <Link href="/dashboard/services" prefetch={true} className="flex-1 flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-blue-600 transition-colors">
+                    <Link href="/dashboard/services" prefetch={true} className="flex-1 flex flex-col items-center justify-center gap-1 text-zinc-400 hover:text-zinc-950 transition-colors">
                         <Briefcase className="h-5 w-5" />
-                        <span className="text-[10px] font-bold">Services</span>
+                        <span className="text-[10px] font-bold uppercase tracking-widest mt-0.5">Svcs</span>
                     </Link>
-                    <Link href="/dashboard/create" prefetch={true} className="flex-1 flex flex-col items-center justify-center gap-1 -mt-8">
-                        <div className="bg-blue-600 rounded-2xl p-3.5 shadow-xl shadow-blue-200 border-4 border-white">
+                    <Link href="/dashboard/create" prefetch={true} className="flex-1 flex flex-col items-center justify-center gap-1 -mt-6">
+                        <div className="bg-zinc-950 rounded-full p-3 shadow-[0_8px_20px_rgb(0,0,0,0.12)] border-2 border-white group-hover:scale-105 transition-transform">
                             <PlusCircle className="h-6 w-6 text-white" />
                         </div>
-                        <span className="text-[10px] font-bold text-blue-600 mt-1">New</span>
                     </Link>
-                    <Link href="/dashboard/profit" prefetch={true} className="flex-1 flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-blue-600 transition-colors">
+                    <Link href="/dashboard/profit" prefetch={true} className="flex-1 flex flex-col items-center justify-center gap-1 text-zinc-400 hover:text-zinc-950 transition-colors">
                         <TrendingUp className="h-5 w-5" />
-                        <span className="text-[10px] font-bold">Profit</span>
+                        <span className="text-[10px] font-bold uppercase tracking-widest mt-0.5">Stats</span>
                     </Link>
                     <form action={handleSignOut} className="flex-1">
-                        <button type="submit" className="w-full h-full flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-red-500 transition-colors py-3">
+                        <button type="submit" className="w-full h-full flex flex-col items-center justify-center gap-1 text-zinc-400 hover:text-rose-500 transition-colors py-3">
                             <LogOut className="h-5 w-5" />
-                            <span className="text-[10px] font-bold">Exit</span>
+                            <span className="text-[10px] font-bold uppercase tracking-widest mt-0.5">Exit</span>
                         </button>
                     </form>
                 </div>

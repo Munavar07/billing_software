@@ -91,19 +91,19 @@ export default function ClientHubManager({ initialClients }: { initialClients: C
 
                 <div className="flex items-center gap-4 w-full sm:w-auto">
                     <div className="relative flex-1 sm:w-72 group">
-                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 group-focus-within:text-zinc-950 transition-colors" />
                         <input
                             type="text"
                             placeholder="Find a client..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm transition-all"
+                            className="w-full pl-11 pr-4 py-2.5 bg-white border border-neutral-200 rounded-full text-sm font-medium outline-none focus:ring-2 focus:ring-zinc-950/10 focus:border-zinc-950 shadow-sm transition-all text-zinc-950"
                         />
                     </div>
                     {!isAdding && (
                         <button
                             onClick={() => setIsAdding(true)}
-                            className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 hover:-translate-y-0.5 transition-all active:scale-95 whitespace-nowrap"
+                            className="flex items-center gap-2 bg-zinc-950 text-white px-6 py-2.5 rounded-full text-sm font-bold shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:bg-zinc-800 hover:-translate-y-0.5 transition-all whitespace-nowrap"
                         >
                             <PlusCircle className="h-4 w-4" />
                             Add Client
@@ -113,60 +113,60 @@ export default function ClientHubManager({ initialClients }: { initialClients: C
             </div>
 
             {isAdding && (
-                <div className="bg-white p-8 rounded-2xl border border-blue-100 shadow-xl shadow-blue-50/50 ring-4 ring-blue-50/30 animate-in fade-in slide-in-from-top-4 duration-300 max-w-lg">
-                    <div className="flex items-center gap-3 mb-6">
-                        <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
-                            <Users className="h-5 w-5" />
+                <div className="bg-white p-8 rounded-3xl border border-neutral-200 shadow-[0_8px_30px_rgb(0,0,0,0.06)] animate-in fade-in slide-in-from-top-4 duration-300 max-w-lg">
+                    <div className="flex items-center gap-3 mb-8">
+                        <div className="p-2.5 bg-neutral-100 rounded-full text-zinc-950 border border-neutral-200">
+                            <Users className="h-4 w-4" />
                         </div>
-                        <h3 className="text-xl font-bold text-slate-900">New Client Partner</h3>
+                        <h3 className="text-xl font-bold text-zinc-950 tracking-tight">New Client Partner</h3>
                     </div>
-                    <form onSubmit={handleAddClient} className="space-y-6">
+                    <form onSubmit={handleAddClient} className="space-y-8">
                         <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Client Full Name</label>
+                            <label className="block text-xs font-black text-zinc-400 uppercase tracking-widest mb-3">Client Full Name</label>
                             <input
                                 type="text"
                                 required
                                 value={newName}
                                 onChange={e => setNewName(e.target.value)}
-                                className="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium transition-all"
+                                className="w-full border-b-2 border-neutral-200 bg-transparent px-0 py-2 outline-none focus:border-zinc-950 text-zinc-950 text-lg font-semibold transition-all placeholder:text-neutral-300"
                                 placeholder="Enter legal client name..."
                                 autoFocus
                             />
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div>
-                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Mobile Number (Optional)</label>
+                                <label className="block text-xs font-black text-zinc-400 uppercase tracking-widest mb-3">Mobile Number <span className="text-neutral-300">(Optional)</span></label>
                                 <input
                                     type="text"
                                     value={newMobile}
                                     onChange={e => setNewMobile(e.target.value)}
-                                    className="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium transition-all"
+                                    className="w-full border border-neutral-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-zinc-950/10 focus:border-zinc-950 font-medium transition-all"
                                     placeholder="e.g. +971 50 123 4567"
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Email Address (Optional)</label>
+                                <label className="block text-xs font-black text-zinc-400 uppercase tracking-widest mb-3">Email Address <span className="text-neutral-300">(Optional)</span></label>
                                 <input
                                     type="email"
                                     value={newEmail}
                                     onChange={e => setNewEmail(e.target.value)}
-                                    className="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium transition-all"
+                                    className="w-full border border-neutral-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-zinc-950/10 focus:border-zinc-950 font-medium transition-all"
                                     placeholder="client@example.com"
                                 />
                             </div>
                         </div>
-                        <div className="flex justify-end gap-3 pt-2">
+                        <div className="flex justify-end gap-4 pt-4 border-t border-neutral-100">
                             <button
                                 type="button"
                                 onClick={() => setIsAdding(false)}
-                                className="px-6 py-2.5 text-sm font-bold text-slate-500 hover:text-slate-800 transition-colors"
+                                className="px-6 py-2.5 rounded-full text-sm font-bold text-zinc-500 hover:text-zinc-900 hover:bg-neutral-100 transition-colors"
                             >
                                 Cancel
                             </button>
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="bg-slate-900 text-white px-8 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-slate-200 hover:bg-black hover:-translate-y-0.5 transition-all active:scale-95 disabled:opacity-50 flex items-center gap-2"
+                                className="bg-zinc-950 text-white px-8 py-2.5 rounded-full text-sm font-bold shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:bg-zinc-800 hover:-translate-y-0.5 transition-all flex items-center gap-2 disabled:opacity-50"
                             >
                                 {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
                                 Save Partner
@@ -176,76 +176,77 @@ export default function ClientHubManager({ initialClients }: { initialClients: C
                 </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {filteredClients.length > 0 ? (
                     filteredClients.map((client) => (
-                        <div key={client.name} className="bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 group flex flex-col uppercase border-b-4 border-b-slate-50 hover:border-b-blue-500">
-                            <div className="p-6 flex-1">
-                                <div className="flex items-start justify-between mb-6">
-                                    <div className="flex items-center gap-3">
-                                        <div className="h-12 w-12 bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-xl flex items-center justify-center font-black text-lg shadow-lg shadow-blue-100 group-hover:scale-110 transition-transform duration-300">
+                        <div key={client.name} className="bg-white border border-neutral-200 rounded-3xl overflow-hidden hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all duration-300 group flex flex-col group hover:-translate-y-1">
+                            <div className="p-8 flex-1">
+                                <div className="flex items-start justify-between mb-8">
+
+                                    <div className="flex items-center gap-4">
+                                        <div className="h-12 w-12 bg-neutral-100 border border-neutral-200 text-zinc-950 rounded-full flex items-center justify-center font-black text-lg shadow-sm group-hover:scale-105 transition-transform duration-300">
                                             {client.name.charAt(0).toUpperCase()}
                                         </div>
                                         <div>
-                                            <h3 className="text-base font-black text-slate-900 line-clamp-1 group-hover:text-blue-600 transition-colors" title={client.name}>{client.name}</h3>
-                                            <div className="flex flex-col gap-0.5">
-                                                <span className="text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-100 w-fit">CLIENT PARTNER</span>
-                                                {client.mobile && <span className="text-[10px] font-bold text-blue-500">{client.mobile}</span>}
-                                                {client.email && <span className="text-[10px] font-medium text-slate-500 truncate max-w-[150px]" title={client.email}>{client.email}</span>}
+                                            <h3 className="text-base font-black text-zinc-950 line-clamp-1 group-hover:text-zinc-600 transition-colors" title={client.name}>{client.name}</h3>
+                                            <div className="flex flex-col gap-0.5 mt-0.5">
+                                                <span className="text-[9px] font-black tracking-widest text-zinc-400 uppercase w-fit">CLIENT PARTNER</span>
+                                                {client.mobile && <span className="text-[10px] font-bold text-zinc-500">{client.mobile}</span>}
+                                                {client.email && <span className="text-[10px] font-medium text-zinc-400 truncate max-w-[150px]" title={client.email}>{client.email}</span>}
                                             </div>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <button
                                             onClick={(e) => handleDeleteClient(client.name, e)}
-                                            className="h-8 w-8 rounded-full border border-rose-100 flex items-center justify-center text-rose-300 hover:text-rose-600 hover:bg-rose-50 hover:border-rose-200 transition-all z-10 relative"
+                                            className="h-8 w-8 rounded-full border border-rose-100 flex items-center justify-center text-rose-300 hover:text-rose-600 hover:bg-rose-50 transition-all z-10 relative"
                                             title="Delete Client"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /></svg>
                                         </button>
-                                        <div className="h-8 w-8 rounded-full border border-slate-100 flex items-center justify-center text-slate-300 group-hover:text-blue-500 group-hover:border-blue-100 transition-all">
+                                        <div className="h-8 w-8 rounded-full border border-neutral-200 flex items-center justify-center text-zinc-300 group-hover:text-zinc-950 group-hover:border-zinc-950 transition-all">
                                             <ArrowRight className="w-4 h-4" />
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4 text-sm mb-6 bg-slate-50/50 p-4 rounded-xl border border-slate-100/50">
+                                <div className="grid grid-cols-2 gap-4 text-sm mb-6 bg-[#FAFAFA] p-5 rounded-2xl border border-neutral-100">
                                     <div>
-                                        <div className="text-slate-400 text-[9px] uppercase font-black tracking-widest mb-1.5 flex items-center gap-1.5"><FileText className="w-3 h-3" /> Invoices</div>
-                                        <div className="font-black text-slate-900 text-base">{client.invoiceCount}</div>
+                                        <div className="text-zinc-400 text-[9px] uppercase font-black tracking-widest mb-1.5 flex items-center gap-1.5"><FileText className="w-3 h-3" /> Invoices</div>
+                                        <div className="font-black text-zinc-950 text-base">{client.invoiceCount}</div>
                                     </div>
                                     <div className="text-right">
-                                        <div className="text-slate-400 text-[9px] uppercase font-black tracking-widest mb-1.5 flex items-center gap-1.5 justify-end"><TrendingUp className="w-3 h-3 text-emerald-500" /> Revenue</div>
-                                        <div className="font-black text-emerald-600 text-base">{client.totalProfit.toFixed(0)} <span className="text-[10px]">AED</span></div>
+                                        <div className="text-zinc-400 text-[9px] uppercase font-black tracking-widest mb-1.5 flex items-center gap-1.5 justify-end"><TrendingUp className="w-3 h-3" /> Revenue</div>
+                                        <div className="font-black text-zinc-950 text-base">{client.totalProfit.toFixed(0)} <span className="text-[10px] text-zinc-400 font-bold">AED</span></div>
                                     </div>
                                 </div>
 
                                 <div className="space-y-2.5 text-xs font-bold pt-1">
-                                    <div className="flex justify-between items-center text-slate-400">
-                                        <span className="tracking-tighter uppercase tracking-widest text-[9px]">Total Volume:</span>
-                                        <span className="text-slate-700">AED {client.totalBilled.toLocaleString()}</span>
+                                    <div className="flex justify-between items-center text-zinc-400">
+                                        <span className="uppercase tracking-widest text-[9px]">Total Volume:</span>
+                                        <span className="text-zinc-950">AED {client.totalBilled.toLocaleString()}</span>
                                     </div>
                                     <div className="flex justify-between items-center">
-                                        <span className="text-slate-400 tracking-widest text-[9px]">Outstanding:</span>
-                                        <span className={`${client.totalDue > 0 ? 'text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-100' : 'text-slate-900'}`}>
+                                        <span className="text-zinc-400 uppercase tracking-widest text-[9px]">Outstanding:</span>
+                                        <span className={`${client.totalDue > 0 ? 'text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200' : 'text-zinc-950'}`}>
                                             AED {client.totalDue.toLocaleString()}
                                         </span>
                                     </div>
                                 </div>
                             </div>
-                            <Link href={`/dashboard/clients/${encodeURIComponent(client.name)}`} className="bg-slate-50/80 p-4 text-center text-[10px] font-black uppercase tracking-widest text-slate-500 group-hover:text-white group-hover:bg-blue-600 transition-all flex items-center justify-center gap-2">
+                            <Link href={`/dashboard/clients/${encodeURIComponent(client.name)}`} className="bg-[#FAFAFA] border-t border-neutral-100 p-4 text-center text-[10px] font-black uppercase tracking-widest text-zinc-400 group-hover:text-white group-hover:bg-zinc-950 transition-colors flex items-center justify-center gap-2">
                                 Access Detailed Portal <ArrowRight className="w-4 h-4" />
                             </Link>
                         </div>
                     ))
                 ) : (
-                    <div className="col-span-1 md:col-span-2 lg:col-span-3 text-center py-24 bg-white rounded-3xl border-2 border-dashed border-slate-200">
-                        <div className="bg-slate-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <Users className="h-12 w-12 text-slate-200" />
+                    <div className="col-span-1 md:col-span-2 lg:col-span-3 text-center py-24 bg-white rounded-3xl border border-neutral-200 shadow-sm">
+                        <div className="bg-[#FAFAFA] w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-8 border border-neutral-100">
+                            <Users className="h-10 w-10 text-zinc-300" />
                         </div>
-                        <h3 className="text-xl font-black text-slate-900 tracking-tight">Expand Your Network</h3>
-                        <p className="text-slate-400 mt-2 font-medium max-w-xs mx-auto">Start by adding your first client partner to track performance.</p>
-                        <button onClick={() => setIsAdding(true)} className="mt-6 font-bold text-blue-600 hover:text-blue-700 flex items-center gap-2 mx-auto">
+                        <h3 className="text-xl font-black text-zinc-950 tracking-tight">Expand Your Network</h3>
+                        <p className="text-zinc-400 mt-2 font-medium max-w-xs mx-auto">Start by adding your first client partner to track performance.</p>
+                        <button onClick={() => setIsAdding(true)} className="mt-8 font-bold text-zinc-950 hover:text-zinc-700 flex items-center gap-2 mx-auto transition-colors">
                             <PlusCircle className="w-5 h-5" /> Add Partner Now
                         </button>
                     </div>

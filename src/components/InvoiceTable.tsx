@@ -14,7 +14,7 @@ interface Props {
 
 const statusStyles = {
     Paid: 'bg-emerald-50 text-emerald-700 border-emerald-100',
-    'Partially Paid': 'bg-blue-50 text-blue-700 border-blue-100',
+    'Partially Paid': 'bg-amber-50 text-amber-700 border-amber-100',
     Unpaid: 'bg-rose-50 text-rose-700 border-rose-100',
 } as const
 
@@ -104,28 +104,28 @@ export default function InvoiceTable({ initialInvoices }: Props) {
     }, [invoices, search, statusFilter, showDeleted, showOverdue, dateStart, dateEnd])
 
     return (
-        <div className="bg-white border text-sm border-slate-200 shadow-sm rounded-2xl overflow-hidden">
-            <div className="p-6 border-b border-slate-100 bg-slate-50/30 space-y-4">
+        <div className="bg-white border text-sm border-neutral-200/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-3xl overflow-hidden">
+            <div className="p-6 border-b border-neutral-100 bg-[#FAFAFA] space-y-4">
                 <div className="flex flex-col lg:flex-row gap-4 justify-between">
                     <div className="relative flex-1 max-w-xl">
-                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                            <Search className="h-4 w-4 text-slate-400" />
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <Search className="h-4 w-4 text-zinc-400" />
                         </div>
                         <input
                             type="text"
                             placeholder="Find invoices, clients or descriptions..."
-                            className="pl-10 block w-full bg-white border-slate-200 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none border py-2.5 transition-all"
+                            className="pl-11 block w-full bg-white border-neutral-200 rounded-full shadow-sm focus:ring-2 focus:ring-zinc-950/10 focus:border-zinc-950 outline-none border py-2.5 transition-all text-zinc-900"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3">
-                        <div className="flex items-center bg-white border border-slate-200 rounded-xl px-3 py-1 shadow-sm">
-                            <Filter className="h-3.5 w-3.5 text-slate-400 mr-2" />
+                        <div className="flex items-center bg-white border border-neutral-200 rounded-full px-4 py-1 shadow-sm">
+                            <Filter className="h-3.5 w-3.5 text-zinc-400 mr-2" />
                             <select
                                 title="Status filter"
-                                className="bg-transparent text-slate-700 font-semibold py-1.5 outline-none text-xs"
+                                className="bg-transparent text-zinc-700 font-bold py-1.5 outline-none text-xs"
                                 value={statusFilter}
                                 onChange={e => setStatusFilter(e.target.value)}
                             >
@@ -136,11 +136,11 @@ export default function InvoiceTable({ initialInvoices }: Props) {
                             </select>
                         </div>
 
-                        <div className="flex items-center bg-white border border-slate-200 rounded-xl px-3 py-1 shadow-sm">
+                        <div className="flex items-center bg-white border border-neutral-200 rounded-full px-4 py-1 shadow-sm">
                             <input
                                 type="date"
                                 title="Start Date"
-                                className="bg-transparent text-slate-700 font-semibold py-1.5 outline-none text-xs"
+                                className="bg-transparent text-zinc-700 font-bold py-1.5 outline-none text-xs"
                                 value={dateStart}
                                 onChange={e => setDateStart(e.target.value)}
                             />
@@ -158,7 +158,7 @@ export default function InvoiceTable({ initialInvoices }: Props) {
 
                 <div className="flex items-center gap-6 pt-2">
                     <label className="flex items-center gap-2 cursor-pointer group">
-                        <div className={`w-4 h-4 rounded border transition-all flex items-center justify-center ${showDeleted ? 'bg-blue-600 border-blue-600' : 'bg-white border-slate-300 group-hover:border-blue-400'}`}>
+                        <div className={`w-4 h-4 rounded border transition-all flex items-center justify-center ${showDeleted ? 'bg-zinc-950 border-zinc-950' : 'bg-white border-neutral-300 group-hover:border-zinc-400'}`}>
                             <input
                                 type="checkbox"
                                 className="hidden"
@@ -167,7 +167,7 @@ export default function InvoiceTable({ initialInvoices }: Props) {
                             />
                             {showDeleted && <div className="w-1.5 h-1.5 bg-white rounded-full"></div>}
                         </div>
-                        <span className="text-slate-600 font-medium text-xs">Show Deleted</span>
+                        <span className="text-zinc-600 font-bold text-xs uppercase tracking-widest">Show Deleted</span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer group">
                         <div className={`w-4 h-4 rounded border transition-all flex items-center justify-center ${showOverdue ? 'bg-rose-600 border-rose-600' : 'bg-white border-slate-300 group-hover:border-rose-400'}`}>
@@ -251,18 +251,18 @@ export default function InvoiceTable({ initialInvoices }: Props) {
 
             {/* ── DESKTOP TABLE VIEW ── */}
             <div className="hidden md:block overflow-x-auto">
-                <table className="min-w-full divide-y divide-slate-100">
+                <table className="min-w-full divide-y divide-neutral-100">
                     <thead>
-                        <tr className="bg-slate-50/50">
-                            <th scope="col" className="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Invoice / Date</th>
-                            <th scope="col" className="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Client</th>
-                            <th scope="col" className="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</th>
-                            <th scope="col" className="px-6 py-4 text-right text-[10px] font-bold text-slate-400 uppercase tracking-widest">Amount Info</th>
-                            <th scope="col" className="px-6 py-4 text-right text-[10px] font-bold text-slate-400 uppercase tracking-widest">Balance Due</th>
-                            <th scope="col" className="px-6 py-4 text-right text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center justify-end gap-1">
+                        <tr className="bg-[#FAFAFA]">
+                            <th scope="col" className="px-6 py-4 text-left text-[10px] font-black text-zinc-400 uppercase tracking-widest">Invoice / Date</th>
+                            <th scope="col" className="px-6 py-4 text-left text-[10px] font-black text-zinc-400 uppercase tracking-widest">Client</th>
+                            <th scope="col" className="px-6 py-4 text-left text-[10px] font-black text-zinc-400 uppercase tracking-widest">Status</th>
+                            <th scope="col" className="px-6 py-4 text-right text-[10px] font-black text-zinc-400 uppercase tracking-widest">Amount Info</th>
+                            <th scope="col" className="px-6 py-4 text-right text-[10px] font-black text-zinc-400 uppercase tracking-widest">Balance Due</th>
+                            <th scope="col" className="px-6 py-4 text-right text-[10px] font-black text-zinc-400 uppercase tracking-widest flex items-center justify-end gap-1">
                                 Breakdown <InfoIcon className="w-3 h-3" />
                             </th>
-                            <th scope="col" className="px-6 py-4 text-right text-[10px] font-bold text-slate-400 uppercase tracking-widest">Actions</th>
+                            <th scope="col" className="px-6 py-4 text-right text-[10px] font-black text-zinc-400 uppercase tracking-widest">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-slate-50">

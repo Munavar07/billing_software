@@ -121,22 +121,22 @@ export default function ServiceManager({ initialServices }: { initialServices: S
                     </div>
 
                     <div className="flex-1 max-w-sm ml-0 sm:ml-6 relative group">
-                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none transition-colors group-focus-within:text-blue-500">
-                            <Search className="h-4 w-4 text-slate-400" />
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-zinc-950">
+                            <Search className="h-4 w-4 text-zinc-400" />
                         </div>
                         <input
                             type="text"
                             placeholder="Find a service..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="block w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm bg-white shadow-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all font-medium"
+                            className="block w-full pl-11 pr-4 py-2.5 border border-neutral-200 rounded-full text-sm bg-white shadow-sm focus:ring-2 focus:ring-zinc-950/10 focus:border-zinc-950 outline-none transition-all font-medium text-zinc-950"
                         />
                     </div>
                 </div>
                 {!isAdding ? (
                     <button
                         onClick={() => setIsAdding(true)}
-                        className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 hover:-translate-y-0.5 transition-all active:scale-95"
+                        className="flex items-center gap-2 bg-zinc-950 text-white px-6 py-2.5 rounded-full text-sm font-bold shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:bg-zinc-800 hover:-translate-y-0.5 transition-all outline-none"
                     >
                         <PlusCircle className="h-4 w-4" />
                         Add Service
@@ -144,7 +144,7 @@ export default function ServiceManager({ initialServices }: { initialServices: S
                 ) : (
                     <button
                         onClick={cancelEdit}
-                        className="flex items-center gap-2 bg-slate-100 text-slate-600 px-5 py-2.5 rounded-xl text-sm font-bold border border-slate-200 hover:bg-slate-200 transition-all active:scale-95"
+                        className="flex items-center gap-2 bg-white text-zinc-600 px-6 py-2.5 rounded-full text-sm font-bold border border-neutral-200 shadow-sm hover:bg-neutral-50 transition-all outline-none"
                     >
                         <X className="h-4 w-4" />
                         Cancel
@@ -153,23 +153,23 @@ export default function ServiceManager({ initialServices }: { initialServices: S
             </div>
 
             {isAdding && (
-                <div className="bg-white border border-blue-100 rounded-2xl p-8 shadow-xl shadow-blue-50/50 ring-4 ring-blue-50/30 animate-in fade-in slide-in-from-top-4 duration-300">
-                    <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-3">
-                        <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
-                            {editingId ? <Edit2 className="h-5 w-5" /> : <PlusCircle className="h-5 w-5" />}
+                <div className="bg-white border border-neutral-200 rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] animate-in fade-in slide-in-from-top-4 duration-300">
+                    <h3 className="text-xl font-bold text-zinc-950 mb-8 flex items-center gap-3 tracking-tight">
+                        <div className="p-2.5 bg-neutral-100 rounded-full text-zinc-950 border border-neutral-200">
+                            {editingId ? <Edit2 className="h-4 w-4" /> : <PlusCircle className="h-4 w-4" />}
                         </div>
                         {editingId ? 'Edit Service' : 'Add New Service'}
                     </h3>
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <form onSubmit={handleSubmit} className="space-y-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div className="md:col-span-2">
-                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Service Name</label>
+                                <label className="block text-xs font-black text-zinc-400 uppercase tracking-widest mb-3">Service Name</label>
                                 <input
                                     type="text"
                                     required
                                     value={name}
                                     onChange={e => setName(e.target.value)}
-                                    className="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium transition-all"
+                                    className="w-full border-b-2 border-neutral-200 bg-transparent px-0 py-2 outline-none focus:border-zinc-950 text-zinc-950 text-lg font-semibold transition-all placeholder:text-neutral-300"
                                     placeholder="e.g. Executive Visa Processing"
                                 />
                             </div>
@@ -224,15 +224,15 @@ export default function ServiceManager({ initialServices }: { initialServices: S
                 </div>
             )}
 
-            <div className="bg-white border border-slate-200 shadow-sm rounded-2xl overflow-hidden">
-                <table className="min-w-full divide-y divide-slate-100">
-                    <thead className="bg-slate-50/50">
+            <div className="bg-white border border-neutral-200 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-3xl overflow-hidden mt-6">
+                <table className="min-w-full divide-y divide-neutral-100">
+                    <thead className="bg-[#FAFAFA]">
                         <tr>
-                            <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Service Name</th>
-                            <th className="px-6 py-4 text-right text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pricing (AED)</th>
-                            <th className="px-6 py-4 text-right text-[10px] font-bold text-slate-400 uppercase tracking-widest">Govt Fee</th>
-                            <th className="px-6 py-4 text-right text-[10px] font-bold text-slate-400 uppercase tracking-widest">Our Charge</th>
-                            <th className="px-6 py-4 text-right text-[10px] font-bold text-slate-400 uppercase tracking-widest">Actions</th>
+                            <th className="px-6 py-5 text-left text-[10px] font-black text-zinc-400 uppercase tracking-widest">Service Name</th>
+                            <th className="px-6 py-5 text-right text-[10px] font-black text-zinc-400 uppercase tracking-widest">Pricing (AED)</th>
+                            <th className="px-6 py-5 text-right text-[10px] font-black text-zinc-400 uppercase tracking-widest">Govt Fee</th>
+                            <th className="px-6 py-5 text-right text-[10px] font-black text-zinc-400 uppercase tracking-widest">Our Charge</th>
+                            <th className="px-6 py-5 text-right text-[10px] font-black text-zinc-400 uppercase tracking-widest">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-slate-50">
