@@ -233,21 +233,26 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
                         styles={{
                             control: (base) => ({
                                 ...base,
-                                padding: '4px',
+                                minHeight: '48px',
                                 borderRadius: '9999px',
                                 borderColor: '#e5e5e5',
+                                padding: '0 12px',
                                 '&:hover': { borderColor: '#09090b' },
-                                boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                                boxShadow: 'none',
                                 zIndex: 30
                             }),
                             singleValue: (base) => ({
                                 ...base,
                                 color: '#09090b',
-                                fontWeight: '500'
+                                fontWeight: '600'
                             }),
                             input: (base) => ({
                                 ...base,
                                 color: '#09090b'
+                            }),
+                            placeholder: (base) => ({
+                                ...base,
+                                color: '#a1a1aa'
                             })
                         }}
                     />
@@ -298,12 +303,13 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
                         styles={{
                             control: (base) => ({
                                 ...base,
-                                padding: '4px',
+                                minHeight: '48px',
                                 borderRadius: '9999px',
                                 borderColor: '#e5e5e5',
+                                padding: '0 12px',
                                 backgroundColor: 'white',
                                 '&:hover': { borderColor: '#09090b' },
-                                boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
+                                boxShadow: 'none'
                             }),
                             menu: (base) => ({
                                 ...base,
@@ -312,11 +318,15 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
                             singleValue: (base) => ({
                                 ...base,
                                 color: '#09090b',
-                                fontWeight: '500'
+                                fontWeight: '600'
                             }),
                             input: (base) => ({
                                 ...base,
                                 color: '#09090b'
+                            }),
+                            placeholder: (base) => ({
+                                ...base,
+                                color: '#a1a1aa'
                             })
                         }}
                     />
