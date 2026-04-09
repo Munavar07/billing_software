@@ -1,5 +1,17 @@
 import { createClient } from '@/utils/supabase/server'
 
+export interface LineItem {
+    id: string
+    service_id?: string
+    name: string
+    description?: string
+    qty: number
+    rate: number
+    govt_charge: number
+    service_charge: number
+    total: number
+}
+
 export interface Invoice {
     id: string
     invoice_number: string
@@ -14,6 +26,7 @@ export interface Invoice {
     created_by: string
     hidden_remarks?: string
     invoice_description?: string
+    line_items?: LineItem[]
     is_deleted: boolean
     created_at: string
 }

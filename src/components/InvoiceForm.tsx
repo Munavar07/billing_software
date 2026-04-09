@@ -8,8 +8,20 @@ import Select from 'react-select'
 import CreatableSelect from 'react-select/creatable'
 import { addClientAction } from '@/app/dashboard/clients/actions'
 import { addService } from '@/app/dashboard/services/actions'
-import { Loader2, Save, ArrowLeft } from 'lucide-react'
+import { Loader2, Save, ArrowLeft, Plus, Trash2, Hash } from 'lucide-react'
 import Link from 'next/link'
+
+interface LineItem {
+    id: string
+    service_id?: string
+    name: string
+    description?: string
+    qty: number
+    rate: number
+    govt_charge: number
+    service_charge: number
+    total: number
+}
 
 interface Props {
     initialData?: Invoice
@@ -47,12 +59,34 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
         invoice_description: initialData?.invoice_description || ''
     })
 
+    const [lineItems, setLineItems] = useState<LineItem[]>(initialData?.line_items || [])
     const [selectedServiceId, setSelectedServiceId] = useState('')
     const [newClientMobile, setNewClientMobile] = useState('')
     const [newClientEmail, setNewClientEmail] = useState('')
     const [clientInputValue, setClientInputValue] = useState('')
 
     const isNewClient = (clientInputValue && !knownClients.includes(clientInputValue)) || (formData.client_name && !knownClients.includes(formData.client_name))
+
+    // Aggregate line items into totals
+    useEffect(() => {
+        let totalAmount = 0
+        let totalGovt = 0
+        let totalService = 0
+
+        lineItems.forEach(item => {
+            totalAmount += item.total
+            totalGovt += item.govt_charge * item.qty
+            totalService += item.service_charge * item.qty
+        })
+
+        setFormData(prev => ({
+            ...prev,
+            amount: totalAmount,
+            commission: totalGovt,
+            profit: totalService,
+            invoice_description: lineItems.map(item => item.name).join(', ')
+        }))
+    }, [lineItems])
 
     useEffect(() => {
         const due = formData.amount - formData.paid
@@ -74,6 +108,12 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+
+        if (lineItems.length === 0) {
+            toast.error('Please add at least one service to the invoice.')
+            return
+        }
+
         setLoading(true)
 
         try {
@@ -84,10 +124,15 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
             const url = isEdit ? `/api/invoices/${initialData?.id}` : `/api/invoices`
             const method = isEdit ? 'PUT' : 'POST'
 
+            const finalData = {
+                ...formData,
+                line_items: lineItems
+            }
+
             const res = await fetch(url, {
                 method,
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(finalData)
             })
 
             const responseData = await res.json()
@@ -110,27 +155,13 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
         const { name, value } = e.target
 
         // Handle numeric fields
-        if (['amount', 'paid', 'commission', 'profit'].includes(name)) {
+        if (['paid'].includes(name)) {
             const val = parseFloat(value) || 0
-
-            if (name === 'commission' || name === 'profit') {
-                const commission = name === 'commission' ? val : (formData.commission as number)
-                const profit = name === 'profit' ? val : (formData.profit as number)
-                const total = commission + profit
-
-                setFormData(prev => ({
-                    ...prev,
-                    [name]: val,
-                    amount: total,
-                    amount_due: Math.max(0, total - (prev.paid as number))
-                }))
-            } else if (name === 'paid') {
-                setFormData(prev => ({
-                    ...prev,
-                    paid: val,
-                    amount_due: Math.max(0, (prev.amount as number) - val)
-                }))
-            }
+            setFormData(prev => ({
+                ...prev,
+                paid: val,
+                amount_due: Math.max(0, (prev.amount as number) - val)
+            }))
             return
         }
 
@@ -147,14 +178,37 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
 
         const service = serviceOptions.find(o => o.value === id)?.service
         if (service) {
-            setFormData(prev => ({
-                ...prev,
-                amount: service.total_amount,
-                commission: service.govt_charge,
-                profit: service.service_charge,
-                invoice_description: service.name
-            }))
+            const newItem: LineItem = {
+                id: crypto.randomUUID(),
+                service_id: service.id,
+                name: service.name,
+                qty: 1,
+                rate: service.total_amount,
+                govt_charge: service.govt_charge,
+                service_charge: service.service_charge,
+                total: service.total_amount
+            }
+            setLineItems(prev => [...prev, newItem])
+            setSelectedServiceId('') // Reset select after adding
         }
+    }
+
+    const removeLineItem = (id: string) => {
+        setLineItems(prev => prev.filter(item => item.id !== id))
+    }
+
+    const updateLineItem = (id: string, updates: Partial<LineItem>) => {
+        setLineItems(prev => prev.map(item => {
+            if (item.id !== id) return item
+            const updated = { ...item, ...updates }
+
+            // Recalculate total for this item
+            const rate = updated.rate || 0
+            const qty = updated.qty || 1
+            updated.total = rate * qty
+
+            return updated
+        }))
     }
 
     const handleServiceCreate = async (inputValue: string) => {
@@ -168,14 +222,24 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
             })
 
             if (newService) {
+                const newItem: LineItem = {
+                    id: crypto.randomUUID(),
+                    service_id: newService.id,
+                    name: newService.name,
+                    qty: 1,
+                    rate: newService.total_amount,
+                    govt_charge: newService.govt_charge,
+                    service_charge: newService.service_charge,
+                    total: newService.total_amount
+                }
                 const newOption = {
                     value: newService.id,
                     label: `${newService.name} (AED ${newService.total_amount})`,
                     service: newService
                 }
                 setServiceOptions(prev => [...prev, newOption])
-                setSelectedServiceId(newService.id)
-                setFormData(prev => ({ ...prev, invoice_description: inputValue }))
+                setLineItems(prev => [...prev, newItem])
+                setSelectedServiceId('')
                 toast.success(`Service "${inputValue}" saved to predefined list.`)
             }
         } catch (e) {
@@ -286,65 +350,130 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
                     </div>
                 )}
 
-                <div className="md:col-span-2 bg-zinc-50 p-6 rounded-3xl border border-neutral-200 mb-2 relative z-20">
-                    <label className="block text-xs font-black text-zinc-400 uppercase tracking-widest mb-3">Link Predefined Service <span className="text-neutral-300">(Optional)</span></label>
-                    <CreatableSelect
-                        isClearable
-                        isDisabled={loading}
-                        isLoading={loading}
-                        className="text-zinc-950 font-medium"
-                        placeholder="Search predefined services..."
-                        options={serviceOptions}
-                        value={selectedServiceId ? serviceOptions.find(o => o.value === selectedServiceId) : null}
-                        onChange={(option: any) => {
-                            handleServiceSelect(option?.value || '')
-                        }}
-                        onCreateOption={handleServiceCreate}
-                        styles={{
-                            control: (base) => ({
-                                ...base,
-                                minHeight: '48px',
-                                borderRadius: '9999px',
-                                borderColor: '#e5e5e5',
-                                padding: '0 12px',
-                                backgroundColor: 'white',
-                                '&:hover': { borderColor: '#09090b' },
-                                boxShadow: 'none'
-                            }),
-                            menu: (base) => ({
-                                ...base,
-                                zIndex: 50
-                            }),
-                            singleValue: (base) => ({
-                                ...base,
-                                color: '#09090b',
-                                fontWeight: '600'
-                            }),
-                            input: (base) => ({
-                                ...base,
-                                color: '#09090b'
-                            }),
-                            placeholder: (base) => ({
-                                ...base,
-                                color: '#a1a1aa'
-                            })
-                        }}
-                    />
-                    <p className="text-[10px] text-zinc-500 mt-3 font-bold">Populates Amount, Govt Charge, and Service Charge automatically.</p>
+                <div className="md:col-span-2">
+                    <div className="flex items-center justify-between mb-4 border-b border-neutral-100 pb-2">
+                        <label className="text-[10px] font-black text-zinc-950 uppercase tracking-[0.2em]">Selected Services <span className="text-rose-500">*</span></label>
+                        <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">{lineItems.length} Items</span>
+                    </div>
+
+                    {lineItems.length === 0 ? (
+                        <div className="bg-neutral-50 border border-dashed border-neutral-200 rounded-3xl p-10 text-center mb-6">
+                            <Plus className="h-8 w-8 text-neutral-200 mx-auto mb-3" />
+                            <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">At least one service is required</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-4 mb-6">
+                            {lineItems.map((item, idx) => (
+                                <div key={item.id} className="bg-white border border-neutral-200 rounded-[24px] p-5 shadow-sm hover:shadow-md transition-all group overflow-hidden relative">
+                                    <div className="flex flex-col sm:flex-row gap-4 sm:items-center">
+                                        <div className="h-8 w-8 bg-zinc-950 rounded-full flex items-center justify-center text-white text-[10px] font-black flex-shrink-0">
+                                            {idx + 1}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <input
+                                                type="text"
+                                                value={item.name}
+                                                onChange={e => updateLineItem(item.id, { name: e.target.value })}
+                                                className="w-full text-zinc-950 font-black tracking-tight outline-none border-b border-transparent focus:border-zinc-950/20 pb-1"
+                                                placeholder="Service name..."
+                                            />
+                                            <div className="flex items-center gap-4 mt-1">
+                                                <div className="flex items-center gap-1.5">
+                                                    <label className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Qty</label>
+                                                    <input
+                                                        type="number"
+                                                        value={item.qty}
+                                                        onChange={e => updateLineItem(item.id, { qty: parseFloat(e.target.value) || 0 })}
+                                                        className="w-12 bg-neutral-50 rounded-full px-2 py-0.5 text-[10px] font-black text-zinc-950 outline-none focus:ring-1 focus:ring-zinc-950"
+                                                    />
+                                                </div>
+                                                <div className="flex items-center gap-1.5">
+                                                    <label className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Rate</label>
+                                                    <input
+                                                        type="number"
+                                                        value={item.rate}
+                                                        onChange={e => updateLineItem(item.id, { rate: parseFloat(e.target.value) || 0 })}
+                                                        className="w-20 bg-neutral-50 rounded-full px-3 py-0.5 text-[10px] font-black text-zinc-950 outline-none focus:ring-1 focus:ring-zinc-950"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="flex sm:flex-col items-end gap-1 sm:gap-2">
+                                            <span className="text-sm font-black text-zinc-950">AED {item.total.toLocaleString()}</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => removeLineItem(item.id)}
+                                                className="text-zinc-300 hover:text-rose-500 transition-colors sm:p-1"
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    <div className="bg-zinc-50 p-6 rounded-3xl border border-neutral-200 mb-8 relative z-20">
+                        <label className="block text-xs font-black text-zinc-400 uppercase tracking-widest mb-3">Add Service from Predefined List</label>
+                        <CreatableSelect
+                            isClearable
+                            isDisabled={loading}
+                            isLoading={loading}
+                            className="text-zinc-950 font-medium"
+                            placeholder="Search predefined services..."
+                            options={serviceOptions}
+                            value={null} // Keep it null so it resets after adding
+                            onChange={(option: any) => {
+                                handleServiceSelect(option?.value || '')
+                            }}
+                            onCreateOption={handleServiceCreate}
+                            styles={{
+                                control: (base) => ({
+                                    ...base,
+                                    minHeight: '48px',
+                                    borderRadius: '9999px',
+                                    borderColor: '#e5e5e5',
+                                    padding: '0 12px',
+                                    backgroundColor: 'white',
+                                    '&:hover': { borderColor: '#09090b' },
+                                    boxShadow: 'none'
+                                }),
+                                menu: (base) => ({
+                                    ...base,
+                                    zIndex: 50
+                                }),
+                                singleValue: (base) => ({
+                                    ...base,
+                                    color: '#09090b',
+                                    fontWeight: '600'
+                                }),
+                                input: (base) => ({
+                                    ...base,
+                                    color: '#09090b'
+                                }),
+                                placeholder: (base) => ({
+                                    ...base,
+                                    color: '#a1a1aa'
+                                })
+                            }}
+                        />
+                        <p className="text-[10px] text-zinc-500 mt-3 font-bold uppercase tracking-widest">Selecting a service adds it to the list above.</p>
+                    </div>
                 </div>
 
                 <div>
-                    <label className="block text-xs font-black text-zinc-400 uppercase tracking-widest mb-3">Govt Charge (AED)</label>
-                    <input type="number" name="commission" value={formData.commission} onChange={handleChange} className="w-full border border-neutral-200 rounded-full shadow-sm focus:ring-2 focus:ring-zinc-950/10 focus:border-zinc-950 py-3 px-5 outline-none transition-all font-medium" placeholder="0" />
+                    <label className="block text-xs font-black text-zinc-400 uppercase tracking-widest mb-3">Total Govt Charge (AED)</label>
+                    <input readOnly type="number" name="commission" value={formData.commission} className="w-full border border-neutral-200 rounded-full py-3 px-5 outline-none bg-[#FAFAFA] text-zinc-600 cursor-not-allowed font-medium" />
                 </div>
 
                 <div>
-                    <label className="block text-xs font-black text-zinc-400 uppercase tracking-widest mb-3">Service Charge (AED)</label>
-                    <input type="number" name="profit" value={formData.profit} onChange={handleChange} className="w-full border border-neutral-200 rounded-full shadow-sm focus:ring-2 focus:ring-zinc-950/10 focus:border-zinc-950 py-3 px-5 outline-none transition-all font-medium" placeholder="0" />
+                    <label className="block text-xs font-black text-zinc-400 uppercase tracking-widest mb-3">Total Service Charge (AED)</label>
+                    <input readOnly type="number" name="profit" value={formData.profit} className="w-full border border-neutral-200 rounded-full py-3 px-5 outline-none bg-[#FAFAFA] text-zinc-600 cursor-not-allowed font-medium" />
                 </div>
 
                 <div>
-                    <label className="block text-xs font-black text-zinc-400 uppercase tracking-widest mb-3">Total Amount (AED)</label>
+                    <label className="block text-xs font-black text-zinc-400 uppercase tracking-widest mb-3">Total Billed Amount (AED)</label>
                     <input readOnly type="number" name="amount" value={formData.amount} className="w-full border border-neutral-200 rounded-full py-3 px-5 outline-none bg-[#FAFAFA] text-zinc-600 cursor-not-allowed font-black" placeholder="0" />
                 </div>
 
@@ -354,13 +483,13 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
                 </div>
 
                 <div>
-                    <label className="block text-xs font-black text-zinc-400 uppercase tracking-widest mb-3">Amount Due (AED)</label>
-                    <input readOnly type="number" name="amount_due" value={formData.amount_due} className="w-full border border-neutral-100 rounded-full py-3 px-5 outline-none bg-zinc-100 cursor-not-allowed font-black" />
+                    <label className="block text-xs font-black text-zinc-400 uppercase tracking-widest mb-3">Remaining Balance (AED)</label>
+                    <input readOnly type="number" name="amount_due" value={formData.amount_due} className="w-full border border-neutral-100 rounded-full py-3 px-5 outline-none bg-zinc-100 cursor-not-allowed font-black text-zinc-950" />
                 </div>
 
                 <div>
-                    <label className="block text-xs font-black text-zinc-400 uppercase tracking-widest mb-3">Status</label>
-                    <select name="status" value={formData.status} onChange={handleChange} className="w-full border border-neutral-200 rounded-full shadow-sm focus:ring-2 focus:ring-zinc-950/10 focus:border-zinc-950 py-3 px-5 outline-none appearance-none bg-white font-bold text-zinc-950">
+                    <label className="block text-xs font-black text-zinc-400 uppercase tracking-widest mb-3">Payment Status</label>
+                    <select name="status" value={formData.status} onChange={handleChange} className="w-full border border-neutral-200 rounded-full shadow-sm focus:ring-2 focus:ring-zinc-950/10 focus:border-zinc-950 py-3 px-5 outline-none appearance-none bg-white font-black text-zinc-950 uppercase tracking-widest text-[10px]">
                         <option value="Unpaid">Unpaid</option>
                         <option value="Partially Paid">Partially Paid</option>
                         <option value="Paid">Paid</option>
@@ -368,8 +497,8 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
                 </div>
 
                 <div className="md:col-span-2">
-                    <label className="block text-xs font-black text-zinc-400 uppercase tracking-widest mb-3">Invoice Description (Shown on PDF)</label>
-                    <textarea name="invoice_description" value={formData.invoice_description} onChange={handleChange} rows={2} className="w-full border border-neutral-200 rounded-2xl shadow-sm focus:ring-2 focus:ring-zinc-950/10 focus:border-zinc-950 py-3 px-5 outline-none font-medium transition-all resize-none" placeholder="Service description for the customer..." />
+                    <label className="block text-xs font-black text-zinc-400 uppercase tracking-widest mb-3">Invoice Summary (Internal Reference)</label>
+                    <textarea readOnly name="invoice_description" value={formData.invoice_description} rows={1} className="w-full border border-neutral-100 bg-neutral-50 rounded-2xl py-3 px-5 outline-none font-medium italic text-zinc-400 text-xs" />
                 </div>
 
                 <div className="md:col-span-2">

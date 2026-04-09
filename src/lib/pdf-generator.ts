@@ -133,13 +133,13 @@ export async function generateInvoicePdf(id: string): Promise<Uint8Array | null>
     let yRow = yTable - 20
 
     // Rows
-    const drawRow = (idx: number, service: string, desc: string, rate: number) => {
+    const drawRow = (idx: number, service: string, desc: string, qty: number, rate: number, total: number) => {
         drawText(idx.toString(), 45, yRow + 5, 10, font)
-        drawText(service, 70, yRow + 5, 10, font) // No arabic translation for now to avoid font issues, keep it generic.
+        drawText(service, 70, yRow + 5, 10, font)
         drawText(desc, 200, yRow + 5, 10, font)
-        drawText('1', 380, yRow + 5, 10, font)
+        drawText(qty.toString(), 380, yRow + 5, 10, font)
         drawText(rate.toFixed(2), 440, yRow + 5, 10, font)
-        drawText(rate.toFixed(2), 510, yRow + 5, 10, font)
+        drawText(total.toFixed(2), 510, yRow + 5, 10, font)
 
         // Horizontal line separator
         page.drawLine({
@@ -152,10 +152,15 @@ export async function generateInvoicePdf(id: string): Promise<Uint8Array | null>
         yRow -= 20
     }
 
-    let lineIndex = 1
-    const serviceTitle = 'Professional Services'
-    const serviceDesc = invoice.invoice_description || `Services - ${invoice.client_name}`
-    drawRow(lineIndex++, serviceTitle, serviceDesc, invoice.amount)
+    if (invoice.line_items && invoice.line_items.length > 0) {
+        invoice.line_items.forEach((item, idx) => {
+            drawRow(idx + 1, item.name, item.description || '', item.qty, item.rate, item.total)
+        })
+    } else {
+        const serviceTitle = 'Professional Services'
+        const serviceDesc = invoice.invoice_description || `Services - ${invoice.client_name}`
+        drawRow(1, serviceTitle, serviceDesc, 1, invoice.amount, invoice.amount)
+    }
 
     // Totals Background Lines
     // Add gray background to totals lines
@@ -167,8 +172,9 @@ export async function generateInvoicePdf(id: string): Promise<Uint8Array | null>
         color: rgb(0.95, 0.95, 0.95)
     })
 
+    const itemCount = invoice.line_items?.length || 1
     drawText('Total', 250, yRow - 20 + 8, 10, font)
-    drawText((lineIndex - 1).toString(), 380, yRow - 20 + 8, 10, font)
+    drawText(itemCount.toString(), 380, yRow - 20 + 8, 10, font)
     drawText(invoice.amount.toFixed(2), 440, yRow - 20 + 8, 10, font)
     drawText(invoice.amount.toFixed(2), 510, yRow - 20 + 8, 10, fontBold)
     yRow -= 45 // move down past the total background
