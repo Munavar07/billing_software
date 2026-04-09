@@ -376,41 +376,41 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
                                                 className="w-full text-zinc-950 font-black tracking-tight outline-none border-b border-transparent focus:border-zinc-950/20 pb-1"
                                                 placeholder="Service name..."
                                             />
-                                            <div className="flex items-center gap-4 mt-1">
+                                            <div className="flex flex-wrap items-center gap-3 mt-2">
                                                 <div className="flex items-center gap-1.5">
-                                                    <label className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Qty</label>
+                                                    <label className="text-xs font-bold text-zinc-400 uppercase tracking-wide">Qty</label>
                                                     <input
                                                         type="number"
                                                         value={item.qty}
                                                         onChange={e => updateLineItem(item.id, { qty: parseFloat(e.target.value) || 0 })}
-                                                        className="w-12 bg-neutral-50 rounded-full px-2 py-0.5 text-[10px] font-black text-zinc-950 outline-none focus:ring-1 focus:ring-zinc-950"
+                                                        className="w-14 bg-zinc-100 rounded-full px-3 py-1 text-sm font-bold text-zinc-950 outline-none focus:ring-2 focus:ring-zinc-950/20 focus:bg-white border border-transparent focus:border-zinc-300"
                                                     />
                                                 </div>
                                                 <div className="flex items-center gap-1.5">
-                                                    <label className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Rate</label>
+                                                    <label className="text-xs font-bold text-zinc-400 uppercase tracking-wide">Rate</label>
                                                     <input
                                                         type="number"
                                                         value={item.rate}
                                                         onChange={e => updateLineItem(item.id, { rate: parseFloat(e.target.value) || 0 })}
-                                                        className="w-16 bg-neutral-50 rounded-full px-2 py-0.5 text-[10px] font-black text-zinc-950 outline-none focus:ring-1 focus:ring-zinc-950"
+                                                        className="w-20 bg-zinc-100 rounded-full px-3 py-1 text-sm font-bold text-zinc-950 outline-none focus:ring-2 focus:ring-zinc-950/20 focus:bg-white border border-transparent focus:border-zinc-300"
                                                     />
                                                 </div>
                                                 <div className="flex items-center gap-1.5">
-                                                    <label className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Govt</label>
+                                                    <label className="text-xs font-bold text-blue-500 uppercase tracking-wide">Govt</label>
                                                     <input
                                                         type="number"
                                                         value={item.govt_charge}
                                                         onChange={e => updateLineItem(item.id, { govt_charge: parseFloat(e.target.value) || 0 })}
-                                                        className="w-16 bg-neutral-50 rounded-full px-2 py-0.5 text-[10px] font-black text-zinc-950 outline-none focus:ring-1 focus:ring-zinc-950"
+                                                        className="w-20 bg-blue-50 rounded-full px-3 py-1 text-sm font-bold text-zinc-950 outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white border border-transparent focus:border-blue-300"
                                                     />
                                                 </div>
                                                 <div className="flex items-center gap-1.5">
-                                                    <label className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Srvc</label>
+                                                    <label className="text-xs font-bold text-emerald-600 uppercase tracking-wide">Srvc</label>
                                                     <input
                                                         type="number"
                                                         value={item.service_charge}
                                                         onChange={e => updateLineItem(item.id, { service_charge: parseFloat(e.target.value) || 0 })}
-                                                        className="w-16 bg-neutral-50 rounded-full px-2 py-0.5 text-[10px] font-black text-zinc-950 outline-none focus:ring-1 focus:ring-zinc-950"
+                                                        className="w-20 bg-emerald-50 rounded-full px-3 py-1 text-sm font-bold text-zinc-950 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white border border-transparent focus:border-emerald-300"
                                                     />
                                                 </div>
                                             </div>
@@ -514,8 +514,8 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
                 </div>
 
                 <div className="md:col-span-2">
-                    <label className="block text-xs font-black text-zinc-400 uppercase tracking-widest mb-3">Invoice Summary (Internal Reference)</label>
-                    <textarea readOnly name="invoice_description" value={formData.invoice_description} rows={1} className="w-full border border-neutral-100 bg-neutral-50 rounded-2xl py-3 px-5 outline-none font-medium italic text-zinc-400 text-xs" />
+                    <label className="block text-xs font-black text-zinc-400 uppercase tracking-widest mb-3">Invoice Summary <span className="text-zinc-300 normal-case font-medium tracking-normal">(editable — auto-filled from services)</span></label>
+                    <textarea name="invoice_description" value={formData.invoice_description} onChange={handleChange} rows={2} className="w-full border border-neutral-200 bg-white rounded-2xl shadow-sm focus:ring-2 focus:ring-zinc-950/10 focus:border-zinc-950 py-3 px-5 outline-none font-medium text-zinc-700 text-sm transition-all resize-none" placeholder="e.g. TAWJEEH, DAMAN, BATHAKKA FEE" />
                 </div>
 
                 <div className="md:col-span-2">
