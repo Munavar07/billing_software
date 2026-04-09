@@ -63,9 +63,8 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
     const [selectedServiceId, setSelectedServiceId] = useState('')
     const [newClientMobile, setNewClientMobile] = useState('')
     const [newClientEmail, setNewClientEmail] = useState('')
-    const [clientInputValue, setClientInputValue] = useState('')
 
-    const isNewClient = (clientInputValue && !knownClients.includes(clientInputValue)) || (formData.client_name && !knownClients.includes(formData.client_name))
+    const isNewClient = formData.client_name && !knownClients.includes(formData.client_name)
 
     // Aggregate line items into totals
     useEffect(() => {
@@ -249,7 +248,6 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
     }
 
     const handleClientCreate = async (inputValue: string) => {
-        setClientInputValue(inputValue)
         const newOption = { label: inputValue, value: inputValue }
         setClientOptions(prev => [...prev, newOption])
         setFormData(prev => ({ ...prev, client_name: inputValue }))
@@ -283,13 +281,8 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
                         isLoading={loading}
                         onChange={(newValue: any) => {
                             setFormData(prev => ({ ...prev, client_name: newValue?.value || '' }))
-                            setClientInputValue(newValue?.value || '')
                         }}
                         onCreateOption={handleClientCreate}
-                        inputValue={clientInputValue}
-                        onInputChange={(val, { action }) => {
-                            if (action === 'input-change') setClientInputValue(val)
-                        }}
                         options={clientOptions}
                         value={formData.client_name ? { label: formData.client_name, value: formData.client_name } : null}
                         isSearchable
