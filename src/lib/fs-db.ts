@@ -113,9 +113,9 @@ export async function updateInvoice(id: string, updates: Partial<Invoice>): Prom
 
     if (error) {
         console.error('Supabase error in updateInvoice:', error)
-        return null
+        throw new Error(error.message)
     }
-    if (!data) return null
+    if (!data) throw new Error('Invoice not found')
     return data as Invoice
 }
 
