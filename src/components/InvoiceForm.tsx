@@ -376,6 +376,13 @@ export default function InvoiceForm({ initialData, isEdit, knownClients = [], ne
                                                 className="w-full text-zinc-950 font-black tracking-tight outline-none border-b border-transparent focus:border-zinc-950/20 pb-1"
                                                 placeholder="Service name..."
                                             />
+                                            <input
+                                                type="text"
+                                                value={item.description || ''}
+                                                onChange={e => updateLineItem(item.id, { description: e.target.value })}
+                                                className="w-full text-zinc-500 text-sm outline-none border-b border-transparent focus:border-zinc-300 pb-0.5 mt-1 italic"
+                                                placeholder="Description (optional, shown on invoice)..."
+                                            />
                                             <div className="flex flex-wrap items-center gap-3 mt-2">
                                                 <div className="flex items-center gap-1.5">
                                                     <label className="text-xs font-bold text-zinc-400 uppercase tracking-wide">Qty</label>

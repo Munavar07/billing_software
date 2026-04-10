@@ -1,5 +1,5 @@
 import { PDFDocument, rgb, StandardFonts, PDFFont } from 'pdf-lib'
-import { getInvoice } from './fs-db'
+import { getInvoice, getClients } from './fs-db'
 
 const a = ['', 'ONE ', 'TWO ', 'THREE ', 'FOUR ', 'FIVE ', 'SIX ', 'SEVEN ', 'EIGHT ', 'NINE ', 'TEN ', 'ELEVEN ', 'TWELVE ', 'THIRTEEN ', 'FOURTEEN ', 'FIFTEEN ', 'SIXTEEN ', 'SEVENTEEN ', 'EIGHTEEN ', 'NINETEEN '];
 const b = ['', '', 'TWENTY', 'THIRTY', 'FORTY', 'FIFTY', 'SIXTY', 'SEVENTY', 'EIGHTY', 'NINETY'];
@@ -31,6 +31,9 @@ export async function generateInvoicePdf(id: string): Promise<Uint8Array | null>
     const invoice = await getInvoice(id)
     if (!invoice) return null
 
+    // Fetch client contact info
+    const clients = await getClients()
+    const client = clients.find(c => c.name.toLowerCase() === invoice.client_name.toLowerCase())
 
     const pdfDoc = await PDFDocument.create()
     const page = pdfDoc.addPage([595.28, 841.89]) // A4 portrait
@@ -100,15 +103,29 @@ export async function generateInvoicePdf(id: string): Promise<Uint8Array | null>
     const clientNameStr = invoice.client_name.toUpperCase()
     const clientNameWidth = fontBold.widthOfTextAtSize(clientNameStr, 12)
     drawText(clientNameStr, rightMargin - clientNameWidth, yRight, 12, fontBold)
-    yRight -= 14
+    yRight -= 16
 
-    // Contact No / Email if applicable 
-    // We do not have them in DB directly so we will put placeholders that user can fill or remove. 
-    // If not, we omit. For now, matching image exactly with empty Email and hardcoded contact.
-    // Let's just draw the labels.
-    const contactLine = 'Contact No: '
-    // contact info omitted per request
-    yRight -= 10
+    // Show mobile if available
+    if (client?.mobile) {
+        const mobLabel = 'Mob: '
+        const mobVal = client.mobile
+        const mobLabelWidth = fontBold.widthOfTextAtSize(mobLabel, 9)
+        const mobValWidth = font.widthOfTextAtSize(mobVal, 9)
+        const mobTotalWidth = mobLabelWidth + mobValWidth
+        drawText(mobLabel, rightMargin - mobTotalWidth, yRight, 9, fontBold)
+        drawText(mobVal, rightMargin - mobValWidth, yRight, 9, font)
+        yRight -= 13
+    }
+
+    // Show email if available
+    if (client?.email) {
+        const emailStr = client.email
+        const emailWidth = font.widthOfTextAtSize(emailStr, 9)
+        drawText(emailStr, rightMargin - emailWidth, yRight, 9, font)
+        yRight -= 13
+    }
+
+    yRight -= 5
 
     // --- Table ---
     let yTable = height - 340
