@@ -304,10 +304,6 @@ export async function generateInvoicePdf(id: string): Promise<Uint8Array | null>
     drawText('Thank you for your business!', 40, footerY - 25, 10, font, rgb(0.4, 0.4, 0.4))
     drawText('Should you have any enquiries concerning this invoice, please contact us.', 40, footerY - 40, 8, font, rgb(0.5, 0.5, 0.5))
 
-    // Authorized Signature
-    const sigX = width - 180
-    drawText('Authorized Signature', sigX, footerY - 60, 10, fontBold)
-    page.drawLine({ start: { x: sigX, y: footerY - 45 }, end: { x: width - 40, y: footerY - 45 }, thickness: 0.5, color: rgb(0.7, 0.7, 0.7) })
     
     // Draw Inv number at bottom right for filing
     const footerNumStr = `Reference: ${invoice.invoice_number}`
