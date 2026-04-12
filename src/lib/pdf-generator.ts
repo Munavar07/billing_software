@@ -46,14 +46,23 @@ export async function generateInvoicePdf(id: string): Promise<Uint8Array | null>
         page.drawText(text, { x, y, size, font: f, color })
     }
 
+    // --- Top Branding Accent ---
+    page.drawRectangle({
+        x: 0,
+        y: height - 8,
+        width: width,
+        height: 8,
+        color: rgb(0.05, 0.05, 0.05)
+    })
+
     // --- Header Left: Company Info ---
-    let yLeft = height - 160 // giving space for the logo area
-    drawText('BIZNET BUSINESSMEN SERVICES', 40, yLeft, 14, fontBold)
+    let yLeft = height - 130 // giving space for the logo area
+    drawText('BIZNET BUSINESSMEN SERVICES', 40, yLeft, 16, fontBold)
     const companyAddress = [
         'AL AIN, SANAYIA, UAE',
         'Mob: +971 568304427'
     ]
-    yLeft -= 15
+    yLeft -= 18
     companyAddress.forEach(line => {
         let isBoldLine = line.startsWith('Tel:') || line.startsWith('Mob:') || line.startsWith('Email:')
         if (isBoldLine) {
@@ -64,7 +73,7 @@ export async function generateInvoicePdf(id: string): Promise<Uint8Array | null>
             const labelWidth = fontBold.widthOfTextAtSize(label, 10)
             drawText(val, 40 + labelWidth, yLeft, 10, font)
         } else {
-            drawText(line, 40, yLeft, 10, font)
+            drawText(line, 40, yLeft, 10, font, rgb(0.3, 0.3, 0.3))
         }
         yLeft -= 14
     })
@@ -72,8 +81,8 @@ export async function generateInvoicePdf(id: string): Promise<Uint8Array | null>
     // --- Header Right: INVOICE title ---
     const rightMargin = width - 40
     const titleText = 'INVOICE'
-    const titleWidth = fontBold.widthOfTextAtSize(titleText, 24)
-    drawText(titleText, rightMargin - titleWidth, height - 70, 24, fontBold)
+    const titleWidth = fontBold.widthOfTextAtSize(titleText, 28)
+    drawText(titleText, rightMargin - titleWidth, height - 75, 28, fontBold)
 
     // Invoice Meta
     let yRight = height - 120
@@ -130,43 +139,87 @@ export async function generateInvoicePdf(id: string): Promise<Uint8Array | null>
     // --- Table ---
     let yTable = height - 340
 
+    const colX = {
+        num: 45,
+        service: 70,
+        desc: 200,
+        qty: 395, // Center
+        fees: 485, // Right
+        total: 555  // Right
+    }
+
     // Table Header Background
     page.drawRectangle({
         x: 40,
         y: yTable,
         width: width - 80,
         height: 25,
-        color: rgb(0.92, 0.92, 0.92)
+        color: rgb(0.05, 0.05, 0.05)
     })
 
     const tY = yTable + 8
-    drawText('#', 45, tY, 10, font)
-    drawText('Service', 70, tY, 10, font)
-    drawText('Description', 200, tY, 10, font)
-    drawText('Qty', 380, tY, 10, font)
-    drawText('Fees (AED)', 440, tY, 10, font)
-    drawText('Total (AED)', 505, tY, 10, font)
+    const headerColor = rgb(1, 1, 1)
+    drawText('#', colX.num, tY, 10, fontBold, headerColor)
+    drawText('Service', colX.service, tY, 10, fontBold, headerColor)
+    drawText('Description', colX.desc, tY, 10, fontBold, headerColor)
+    
+    // Centered header
+    const qtyWidth = fontBold.widthOfTextAtSize('Qty', 10)
+    drawText('Qty', colX.qty - (qtyWidth / 2), tY, 10, fontBold, headerColor)
+    
+    // Right headers
+    const feesWidth = fontBold.widthOfTextAtSize('Fees (AED)', 10)
+    drawText('Fees (AED)', colX.fees - feesWidth, tY, 10, fontBold, headerColor)
+    
+    const totalWidth = fontBold.widthOfTextAtSize('Total (AED)', 10)
+    drawText('Total (AED)', colX.total - totalWidth, tY, 10, fontBold, headerColor)
 
     let yRow = yTable - 20
 
     // Rows
     const drawRow = (idx: number, service: string, desc: string, qty: number, rate: number, total: number) => {
-        drawText(idx.toString(), 45, yRow + 5, 10, font)
-        drawText(service, 70, yRow + 5, 10, font)
-        drawText(desc, 200, yRow + 5, 10, font)
-        drawText(qty.toString(), 380, yRow + 5, 10, font)
-        drawText(rate.toFixed(2), 440, yRow + 5, 10, font)
-        drawText(total.toFixed(2), 510, yRow + 5, 10, font)
+        const rowHeight = 25
+        const isEven = idx % 2 === 0
+        
+        if (isEven) {
+            page.drawRectangle({
+                x: 40,
+                y: yRow - 5,
+                width: width - 80,
+                height: rowHeight,
+                color: rgb(0.98, 0.98, 0.98)
+            })
+        }
 
-        // Horizontal line separator
+        const rowY = yRow + 5
+        drawText(idx.toString(), colX.num + 2, rowY, 10, font)
+        drawText(service, colX.service, rowY, 10, fontBold)
+        drawText(desc, colX.desc, rowY, 9, font, rgb(0.4, 0.4, 0.4))
+        
+        // Center Qty
+        const qStr = qty.toString()
+        const qW = font.widthOfTextAtSize(qStr, 10)
+        drawText(qStr, colX.qty - (qW / 2), rowY, 10, font)
+        
+        // Right align Fees
+        const fStr = rate.toFixed(2)
+        const fW = font.widthOfTextAtSize(fStr, 10)
+        drawText(fStr, colX.fees - fW, rowY, 10, font)
+        
+        // Right align Total
+        const tStr = total.toFixed(2)
+        const tW = fontBold.widthOfTextAtSize(tStr, 10)
+        drawText(tStr, colX.total - tW, rowY, 10, fontBold)
+
+        // Subtle bottom border
         page.drawLine({
-            start: { x: 40, y: yRow },
-            end: { x: width - 40, y: yRow },
-            thickness: 0.5,
-            color: rgb(0.8, 0.8, 0.8)
+            start: { x: 40, y: yRow - 5 },
+            end: { x: width - 40, y: yRow - 5 },
+            thickness: 0.3,
+            color: rgb(0.9, 0.9, 0.9)
         })
 
-        yRow -= 20
+        yRow -= rowHeight
     }
 
     if (invoice.line_items && invoice.line_items.length > 0) {
@@ -190,31 +243,47 @@ export async function generateInvoicePdf(id: string): Promise<Uint8Array | null>
     })
 
     const itemCount = invoice.line_items?.length || 1
-    drawText('Total', 250, yRow - 20 + 8, 10, font)
-    drawText(itemCount.toString(), 380, yRow - 20 + 8, 10, font)
-    drawText(invoice.amount.toFixed(2), 440, yRow - 20 + 8, 10, font)
-    drawText(invoice.amount.toFixed(2), 510, yRow - 20 + 8, 10, fontBold)
-    yRow -= 45 // move down past the total background
+    drawText('Total', colX.desc, yRow - 12, 10, font)
+    
+    const countStr = itemCount.toString()
+    const countW = font.widthOfTextAtSize(countStr, 10)
+    drawText(countStr, colX.qty - (countW / 2), yRow - 12, 10, font)
+    
+    const grandFStr = invoice.amount.toFixed(2)
+    const grandFW = font.widthOfTextAtSize(grandFStr, 10)
+    drawText(grandFStr, colX.fees - grandFW, yRow - 12, 10, font)
+    
+    const grandTStr = invoice.amount.toFixed(2)
+    const grandTW = fontBold.widthOfTextAtSize(grandTStr, 10)
+    drawText(grandTStr, colX.total - grandTW, yRow - 12, 10, fontBold)
+    
+    yRow -= 55 // move down past the total background
 
     // Grand Total
     const labelX = 400
-    const valueX = 510
+    const valueX = colX.total
 
-    drawText('Grand Total (AED)', labelX - 20, yRow, 10, fontBold)
-    drawText(invoice.amount.toFixed(2), valueX, yRow, 10, fontBold)
+    drawText('Grand Total (AED)', labelX - 20, yRow, 11, fontBold)
+    const totalValStr = invoice.amount.toFixed(2)
+    const totalValW = fontBold.widthOfTextAtSize(totalValStr, 11)
+    drawText(totalValStr, valueX - totalValW, yRow, 11, fontBold)
+    yRow -= 22
+
+    page.drawLine({ start: { x: labelX - 20, y: yRow + 10 }, end: { x: width - 40, y: yRow + 10 }, thickness: 0.5, color: rgb(0.8, 0.8, 0.8) })
+
+    drawText('Paid (AED)', labelX - 20, yRow, 10, font, rgb(0.4, 0.4, 0.4))
+    const paidStr = invoice.paid.toFixed(2)
+    const paidW = font.widthOfTextAtSize(paidStr, 10)
+    drawText(paidStr, valueX - paidW, yRow, 10, font)
     yRow -= 20
 
-    page.drawLine({ start: { x: 40, y: yRow + 10 }, end: { x: width - 40, y: yRow + 10 }, thickness: 0.5, color: rgb(0.9, 0.9, 0.9) })
+    page.drawLine({ start: { x: labelX - 20, y: yRow + 10 }, end: { x: width - 40, y: yRow + 10 }, thickness: 0.5, color: rgb(0.9, 0.9, 0.9) })
 
-    drawText('Paid (AED)', labelX - 20, yRow, 10, font)
-    drawText(invoice.paid.toFixed(2), valueX, yRow, 10, font)
-    yRow -= 20
-
-    page.drawLine({ start: { x: 40, y: yRow + 10 }, end: { x: width - 40, y: yRow + 10 }, thickness: 0.5, color: rgb(0.9, 0.9, 0.9) })
-
-    drawText('Amount Due (AED)', labelX - 20, yRow, 10, font)
-    drawText(invoice.amount_due.toFixed(2), valueX, yRow, 10, font)
-    yRow -= 20
+    drawText('Amount Due (AED)', labelX - 20, yRow, 10, fontBold, rgb(0.7, 0.1, 0.1))
+    const dueStr = invoice.amount_due.toFixed(2)
+    const dueW = fontBold.widthOfTextAtSize(dueStr, 10)
+    drawText(dueStr, valueX - dueW, yRow, 10, fontBold, rgb(0.7, 0.1, 0.1))
+    yRow -= 25
 
     // Amount in words
     page.drawRectangle({
@@ -227,15 +296,23 @@ export async function generateInvoicePdf(id: string): Promise<Uint8Array | null>
     drawText('In Words:', 45, yRow, 10, font)
     drawText(formatAmountToWords(invoice.amount), 150, yRow, 10, fontBold)
 
-    // Bottom Line / Footer
-    page.drawLine({ start: { x: 40, y: 100 }, end: { x: width - 40, y: 100 }, thickness: 0.5, color: rgb(0.6, 0.6, 0.6) })
+    // --- Footer Section ---
+    const footerY = 100
+    page.drawLine({ start: { x: 40, y: footerY }, end: { x: width - 40, y: footerY }, thickness: 0.5, color: rgb(0.8, 0.8, 0.8) })
 
-    // Optional Space for QR could be here around x: width - 90, y: 40, but since user said no QR, we leave it blank.
+    // Thank you message
+    drawText('Thank you for your business!', 40, footerY - 25, 10, font, rgb(0.4, 0.4, 0.4))
+    drawText('Should you have any enquiries concerning this invoice, please contact us.', 40, footerY - 40, 8, font, rgb(0.5, 0.5, 0.5))
 
-    // Draw Inv number at bottom right
-    const footerNumStr = invoice.invoice_number
-    const footerNumWidth = font.widthOfTextAtSize(footerNumStr, 8)
-    drawText(footerNumStr, width - 40 - footerNumWidth, 80, 8, font)
+    // Authorized Signature
+    const sigX = width - 180
+    drawText('Authorized Signature', sigX, footerY - 60, 10, fontBold)
+    page.drawLine({ start: { x: sigX, y: footerY - 45 }, end: { x: width - 40, y: footerY - 45 }, thickness: 0.5, color: rgb(0.7, 0.7, 0.7) })
+    
+    // Draw Inv number at bottom right for filing
+    const footerNumStr = `Reference: ${invoice.invoice_number}`
+    const footerNumWidth = font.widthOfTextAtSize(footerNumStr, 7)
+    drawText(footerNumStr, width - 40 - footerNumWidth, 25, 7, font, rgb(0.6, 0.6, 0.6))
 
     const pdfBytes = await pdfDoc.save()
     return pdfBytes
