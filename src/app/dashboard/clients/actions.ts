@@ -36,7 +36,7 @@ export async function deleteClientAction(name: string) {
     }
 }
 
-export async function editClientAction(name: string, updates: { mobile?: string, email?: string }) {
+export async function editClientAction(name: string, updates: { name?: string, mobile?: string, email?: string }) {
     try {
         const client = await updateClientRecord(name, updates)
         if (!client) return { error: 'Failed to update client.' }
@@ -44,6 +44,7 @@ export async function editClientAction(name: string, updates: { mobile?: string,
         revalidatePath('/dashboard/clients')
         revalidatePath('/dashboard/create')
         revalidatePath('/dashboard/edit/[id]', 'page')
+        revalidatePath('/dashboard/clients/[name]', 'page')
 
         return { success: true, client }
     } catch (e: any) {

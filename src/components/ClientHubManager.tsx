@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { PlusCircle, Users, FileText, TrendingUp, ArrowRight, Loader2, Search } from 'lucide-react'
 import Link from 'next/link'
-import { addClientAction } from '@/app/dashboard/clients/actions'
+import { addClientAction, editClientAction } from '@/app/dashboard/clients/actions'
 import { toast } from 'sonner'
 
 interface ClientStats {
@@ -33,8 +33,11 @@ export default function ClientHubManager({ initialClients }: { initialClients: C
 
         setIsLoading(true)
         if (editingClientName) {
-            const { editClientAction } = await import('@/app/dashboard/clients/actions')
-            const res = await editClientAction(editingClientName, { mobile: newMobile.trim(), email: newEmail.trim() })
+            const res = await editClientAction(editingClientName, { 
+                name: newName.trim(),
+                mobile: newMobile.trim(), 
+                email: newEmail.trim() 
+            })
 
             if (res.error) {
                 toast.error(res.error)
@@ -42,7 +45,7 @@ export default function ClientHubManager({ initialClients }: { initialClients: C
                 toast.success('Client updated successfully')
                 setClients(clients.map(c => 
                     c.name === editingClientName 
-                        ? { ...c, mobile: newMobile.trim(), email: newEmail.trim() } 
+                        ? { ...c, name: newName.trim(), mobile: newMobile.trim(), email: newEmail.trim() } 
                         : c
                 ).sort((a, b) => a.name.localeCompare(b.name)))
                 cancelEdit()
@@ -156,10 +159,9 @@ export default function ClientHubManager({ initialClients }: { initialClients: C
                             <input
                                 type="text"
                                 required
-                                disabled={!!editingClientName}
                                 value={newName}
                                 onChange={e => setNewName(e.target.value)}
-                                className={`w-full border-b-2 border-neutral-200 bg-transparent px-0 py-2 outline-none focus:border-zinc-950 text-zinc-950 text-lg font-semibold transition-all placeholder:text-neutral-300 ${editingClientName ? 'opacity-60 cursor-not-allowed' : ''}`}
+                                className={`w-full border-b-2 border-neutral-200 bg-transparent px-0 py-2 outline-none focus:border-zinc-950 text-zinc-950 text-lg font-semibold transition-all placeholder:text-neutral-300`}
                                 placeholder="Enter legal client name..."
                                 autoFocus={!editingClientName}
                             />
@@ -200,7 +202,7 @@ export default function ClientHubManager({ initialClients }: { initialClients: C
                                 className="bg-zinc-950 text-white px-8 py-2.5 rounded-full text-sm font-bold shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:bg-zinc-800 hover:-translate-y-0.5 transition-all flex items-center gap-2 disabled:opacity-50"
                             >
                                 {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
-                                Save Partner
+                                {editingClientName ? 'Save Changes' : 'Save Partner'}
                             </button>
                         </div>
                     </form>

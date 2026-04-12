@@ -218,8 +218,10 @@ export async function deleteClientRecord(name: string): Promise<boolean> {
     return true
 }
 
-export async function updateClientRecord(name: string, updates: { mobile?: string, email?: string }): Promise<Client | null> {
+export async function updateClientRecord(name: string, updates: { name?: string, mobile?: string, email?: string }): Promise<Client | null> {
     const supabase = await createClient()
+    
+    // 1. Update the client record
     const { data, error } = await supabase
         .from('clients')
         .update(updates)
@@ -231,5 +233,20 @@ export async function updateClientRecord(name: string, updates: { mobile?: strin
         console.error('Error updating client:', error)
         return null
     }
+
+    // 2. If name was changed, sync all invoices with the new name
+    if (updates.name && updates.name !== name) {
+        const { error: invoiceError } = await supabase
+            .from('invoices')
+            .update({ client_name: updates.name })
+            .eq('client_name', name)
+        
+        if (invoiceError) {
+            console.error('Error syncing invoices after client rename:', invoiceError)
+            // We don't return null here because the client was already updated, 
+            // but we log the error for diagnostics.
+        }
+    }
+
     return data
 }
